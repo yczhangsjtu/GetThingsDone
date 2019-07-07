@@ -63,7 +63,10 @@ class _BottomNavigationScaffoldState extends State<BottomNavigationScaffold> {
           });
         },
         currentIndex: currentIndex,
-        backgroundColor: widget.bottomBarColor ?? Theme.of(context).primaryColor,
+        backgroundColor: widget.bottomBarColor ?? Theme.of(context).bottomAppBarColor,
+        type: BottomNavigationBarType.fixed,
+        unselectedItemColor: Theme.of(context).accentColor,
+        selectedItemColor: Theme.of(context).primaryColorLight,
       ),
     );
   }
