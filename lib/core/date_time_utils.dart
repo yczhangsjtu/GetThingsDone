@@ -66,4 +66,19 @@ class DateTimeUtils {
     return y * 10000 + m * 100 + d;
   }
 
+  static final hourMinuteExp = RegExp(r"^(上午|下午)?([1-2]?[0-9])(?::|点)(([0-5][0-9])分?|半)?$");
+
+  static int absoluteTime(String time) {
+    var match = hourMinuteExp.firstMatch(time);
+    if(match != null) {
+      String noon = match.group(1);
+      int h = int.parse(match.group(2));
+      String minute = match.group(3);
+      int m = minute == null ? 0 : (
+        minute == "半" ? 30 : int.parse(minute.substring(0, 2))
+      );
+      return (noon == "上午" || noon == null) ? (h * 60 + m) : (h * 60 + m + 720);
+    }
+    return null;
+  }
 }

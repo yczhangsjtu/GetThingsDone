@@ -32,6 +32,24 @@ void main() {
     expect(DateTimeUtils.weekDayName(6), "六");
   });
 
+  test("Test string to time functions", () {
+    expect(DateTimeUtils.absoluteTime("2:50"), 170);
+    expect(DateTimeUtils.absoluteTime("5点"), 300);
+    expect(DateTimeUtils.absoluteTime("5点20"), 320);
+    expect(DateTimeUtils.absoluteTime("5点59分"), 359);
+    expect(DateTimeUtils.absoluteTime("15点半"), 930);
+    expect(DateTimeUtils.absoluteTime("上午2:50"), 170);
+    expect(DateTimeUtils.absoluteTime("上午5点"), 300);
+    expect(DateTimeUtils.absoluteTime("上午5点20"), 320);
+    expect(DateTimeUtils.absoluteTime("上午5点59分"), 359);
+    expect(DateTimeUtils.absoluteTime("上午15点半"), 930);
+    expect(DateTimeUtils.absoluteTime("下午2:50"), 890);
+    expect(DateTimeUtils.absoluteTime("下午5点"), 1020);
+    expect(DateTimeUtils.absoluteTime("下午5点20"), 1040);
+    expect(DateTimeUtils.absoluteTime("下午5点59分"), 1079);
+    expect(DateTimeUtils.absoluteTime("下午3点半"), 930);
+  });
+
   test("Test time", () {
 
     // Test TimeOption
