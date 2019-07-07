@@ -1,9 +1,17 @@
 class DateTimeUtils {
-
   static final weekDayNames = <String>["日", "一", "二", "三", "四", "五", "六"];
 
   static String weekDayName(int day) {
     return weekDayNames[day];
+  }
+
+  static int dayOfWeekByName(String day) {
+    for (int i = 0; i < weekDayNames.length; i++) {
+      if (weekDayNames[i] == day) {
+        return i;
+      }
+    }
+    return null;
   }
 
   static int today() {
@@ -12,7 +20,7 @@ class DateTimeUtils {
   }
 
   static String durationToString(int minutes) {
-    if(minutes == 0) {
+    if (minutes == 0) {
       return "0m";
     }
     var h = minutes ~/ 60;
@@ -22,12 +30,18 @@ class DateTimeUtils {
   }
 
   static String timeToString(int time) {
+    if(time == null) {
+      return null;
+    }
     var h = time ~/ 60;
     var m = time % 60;
-    return "$h:${m~/10}${m%10}";
+    return "$h:${m ~/ 10}${m % 10}";
   }
 
   static String dayToString(int day) {
+    if(day == null) {
+      return null;
+    }
     var gregorian = _julianToGregorian(day);
     var y = gregorian ~/ 10000;
     var m = (gregorian % 10000) ~/ 100;
@@ -35,50 +49,161 @@ class DateTimeUtils {
     return "$y-$m-$d";
   }
 
+  static int dayOfWeek(int day) {
+    if(day == null) {
+      return null;
+    }
+    return (day + 1) % 7;
+  }
+
   static int yearMonthDayToInt(int y, int m, int d) {
+    if(y == null || m == null || d == null) {
+      return null;
+    }
     return _gregorianToJulian(y, m, d);
   }
 
   static int yearMonthDayFromInt(int day) {
+    if(day == null) {
+      return null;
+    }
     return _julianToGregorian(day);
   }
 
   // Refer to http://www.stiltner.org/book/bookcalc.htm for gregorian
   // and julian date
   static int _gregorianToJulian(int y, int m, int d) {
-    return ( 1461 * ( y + 4800 + ( m - 14 ) ~/ 12 ) ) ~/ 4 +
-        ( 367 * ( m - 2 - 12 * ( ( m - 14 ) ~/ 12 ) ) ) ~/ 12 -
-        ( 3 * ( ( y + 4900 + ( m - 14 ) ~/ 12 ) / 100 ) ) ~/ 4 +
-        d - 32075;
+    return (1461 * (y + 4800 + (m - 14) ~/ 12)) ~/ 4 +
+        (367 * (m - 2 - 12 * ((m - 14) ~/ 12))) ~/ 12 -
+        (3 * ((y + 4900 + (m - 14) ~/ 12) / 100)) ~/ 4 +
+        d -
+        32075;
   }
 
   static int _julianToGregorian(int jd) {
     var l = jd + 68569;
-    var n = ( 4 * l ) ~/ 146097;
-    l = l - ( 146097 * n + 3 ) ~/ 4;
-    var i = ( 4000 * ( l + 1 ) ) ~/ 1461001;
-    l = l - ( 1461 * i ) ~/ 4 + 31;
-    var j = ( 80 * l ) ~/ 2447;
-    var d = l - ( 2447 * j ) ~/ 80;
+    var n = (4 * l) ~/ 146097;
+    l = l - (146097 * n + 3) ~/ 4;
+    var i = (4000 * (l + 1)) ~/ 1461001;
+    l = l - (1461 * i) ~/ 4 + 31;
+    var j = (80 * l) ~/ 2447;
+    var d = l - (2447 * j) ~/ 80;
     l = j ~/ 11;
-    var m = j + 2 - ( 12 * l );
-    var y = 100 * ( n - 49 ) + i + l;
+    var m = j + 2 - (12 * l);
+    var y = 100 * (n - 49) + i + l;
     return y * 10000 + m * 100 + d;
   }
 
-  static final hourMinuteExp = RegExp(r"^(上午|下午)?([1-2]?[0-9])(?::|点)(([0-5][0-9])分?|半)?$");
+  static final hourMinuteExp =
+      RegExp(r"^(上午|下午)?([1-2]?[0-9])(?::|点)(([0-5][0-9])分?|半)?$");
+  static final relativeWeekDayExp = RegExp(r"^(下{0,2})周(日|一|二|三|四|五|六)$");
+  static final monthDayExp = RegExp(r"(([1-2]?[0-9])月)?([1-3]?[0-9])(日|号)");
 
   static int absoluteTime(String time) {
     var match = hourMinuteExp.firstMatch(time);
-    if(match != null) {
+    if (match != null) {
       String noon = match.group(1);
       int h = int.parse(match.group(2));
+      if (h > 23 || ((noon == "下午" || noon == "上午") && h > 12)) {
+        return null;
+      }
+      if ((noon == "上午" || noon == "下午") && h == 12) {
+        h = 0;
+      }
       String minute = match.group(3);
-      int m = minute == null ? 0 : (
-        minute == "半" ? 30 : int.parse(minute.substring(0, 2))
-      );
+      int m = minute == null
+          ? 0
+          : (minute == "半" ? 30 : int.parse(minute.substring(0, 2)));
       return (noon == "上午" || noon == null) ? (h * 60 + m) : (h * 60 + m + 720);
     }
+    return null;
+  }
+
+  static int absoluteDate(int today, String day) {
+    if (day == "今天") {
+      return today;
+    }
+    if (day == "明天") {
+      return today + 1;
+    }
+    if (day == "后天") {
+      return today + 2;
+    }
+    if (day == "大后天") {
+      return today + 3;
+    }
+    var match = relativeWeekDayExp.firstMatch(day);
+    if (match != null) {
+      int next = match.group(1)?.length ?? 0;
+      int relativeDayOfWeek = dayOfWeekByName(match.group(2));
+      int todayOfWeek = dayOfWeek(today);
+      int offset = relativeDayOfWeek - todayOfWeek;
+      if (offset < 0) {
+        offset += 7;
+      }
+      if (next > 0 &&
+          ((relativeDayOfWeek >= todayOfWeek && todayOfWeek != 0) ||
+              relativeDayOfWeek == 0)) {
+        offset += 7;
+      }
+      if (next > 1) {
+        offset += 7 * (next - 1);
+      }
+      return today + offset;
+    }
+
+    match = monthDayExp.firstMatch(day);
+    if (match != null) {
+      int dayOfMonth = int.parse(match.group(3));
+      if (dayOfMonth == 0) {
+        return null;
+      }
+      int todayDate = yearMonthDayFromInt(today);
+      int todayOfMonth = todayDate % 100;
+      int todayMonth = (todayDate % 10000) ~/ 100;
+      int year = todayDate ~/ 10000;
+      if (match.group(1) == null) {
+        // Month is not provided
+        if (dayOfMonth == todayOfMonth) {
+          return today;
+        }
+        if (dayOfMonth > todayOfMonth) {
+          int ret = yearMonthDayToInt(year, todayMonth, dayOfMonth);
+          if(yearMonthDayFromInt(ret) != year * 10000 + todayOfMonth * 100 + dayOfMonth) {
+            return null;
+          }
+          return ret;
+        }
+        // By now, the given day is smaller than today, which refers to next
+        // month
+        var month = todayMonth % 12 + 1;
+        // Bump to the next year
+        if(month == 1) {
+          year++;
+        }
+        int ret = yearMonthDayToInt(year, month, dayOfMonth);
+        if(yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
+          return null;
+        }
+        return ret;
+      }
+      // In the case the month is given
+      int month = int.parse(match.group(2));
+      if (month > 12 || month < 1) {
+        return null;
+      }
+      if (month < todayMonth ||
+          (month == todayMonth && dayOfMonth < todayOfMonth)) {
+        // The given month and day is earlier than today, means next year
+        year++;
+      }
+      int ret = yearMonthDayToInt(year, month, dayOfMonth);
+      if(yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
+        return null;
+      }
+      return ret;
+    }
+
     return null;
   }
 }
