@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'components/bottom_navigation_scaffold.dart';
+import 'pages/basket.dart';
 
 void main() => runApp(GTDApp());
 
@@ -12,7 +13,7 @@ class GTDApp extends StatelessWidget {
         BottomNavigationItem(
           icon: Icon(Icons.archive),
           title: "收集箱",
-          page: Text("收集箱")
+          page: Basket()
         ),
         BottomNavigationItem(
             icon: Icon(Icons.directions_run),
