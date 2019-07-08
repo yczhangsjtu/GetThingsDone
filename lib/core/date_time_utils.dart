@@ -1,3 +1,19 @@
+class TimeInterval {
+  final int start;
+  final int length;
+
+  TimeInterval({this.start, this.length});
+
+  String toString() {
+    return start == null
+        ? ""
+        : DateTimeUtils.timeToString(start) +
+            (length == null
+                ? ""
+                : "到${DateTimeUtils.timeToString(start + length)}");
+  }
+}
+
 class DateTimeUtils {
   static final weekDayNames = <String>["日", "一", "二", "三", "四", "五", "六"];
 
@@ -30,7 +46,7 @@ class DateTimeUtils {
   }
 
   static String timeToString(int time) {
-    if(time == null) {
+    if (time == null) {
       return null;
     }
     var h = time ~/ 60;
@@ -39,7 +55,7 @@ class DateTimeUtils {
   }
 
   static String dayToString(int day) {
-    if(day == null) {
+    if (day == null) {
       return null;
     }
     var gregorian = _julianToGregorian(day);
@@ -50,21 +66,21 @@ class DateTimeUtils {
   }
 
   static int dayOfWeek(int day) {
-    if(day == null) {
+    if (day == null) {
       return null;
     }
     return (day + 1) % 7;
   }
 
   static int yearMonthDayToInt(int y, int m, int d) {
-    if(y == null || m == null || d == null) {
+    if (y == null || m == null || d == null) {
       return null;
     }
     return _gregorianToJulian(y, m, d);
   }
 
   static int yearMonthDayFromInt(int day) {
-    if(day == null) {
+    if (day == null) {
       return null;
     }
     return _julianToGregorian(day);
@@ -94,8 +110,16 @@ class DateTimeUtils {
     return y * 10000 + m * 100 + d;
   }
 
-  static final hourMinuteExp =
-      RegExp(r"^(上午|下午)?([1-2]?[0-9])(?::|点)(([0-5][0-9])分?|半)?$");
+  static final hourMinutePattern =
+      r"(上午|下午)?([1-2]?[0-9])(?::|点)(([0-5][0-9])分?|半)?";
+  static final hourMinuteExp = RegExp(r"^" + hourMinutePattern + r"$");
+  static final timeLengthPattern = r"(?:([1-2]?[0-9])(?:小时|h|H))?(?:(\d+)(?:分钟|M|m))?";
+  static final timeLengthExp = RegExp(r"^" + timeLengthPattern + r"$");
+  static final timeIntervalPattern = "($hourMinutePattern)" + // 5 captured groups
+      r"(\s*(?:-|到)\s*" + // start 6th captured group
+      "($hourMinutePattern)" + // group 7 to 11
+      r"|\s+(" + timeLengthPattern +"))"; // group 12, end group 6
+  static final timeIntervalExp = RegExp(r"^" + timeIntervalPattern + r"$");
   static final relativeWeekDayExp = RegExp(r"^(下{0,2})周(日|一|二|三|四|五|六)$");
   static final monthDayExp = RegExp(r"(([1-2]?[0-9])月)?([1-3]?[0-9])(日|号)");
 
@@ -119,6 +143,83 @@ class DateTimeUtils {
     return null;
   }
 
+  static TimeInterval absoluteTimeInterval(String time) {
+    int t = absoluteTime(time);
+    if (t != null) {
+      // This is not interval, just a time point, leave length null
+      return TimeInterval(start: t);
+    }
+
+    var match = timeIntervalExp.firstMatch(time);
+    if (match != null) {
+      int startTime = absoluteTime(match.group(1));
+      assert(match != null);
+      var endTimeStr = match.group(7);
+      var lengthStr = match.group(12);
+      if(endTimeStr != null) {
+        int endTime = absoluteTime(endTimeStr);
+        if(endTime == null) {
+          return null;
+        }
+        if(endTime < startTime) {
+          return null;
+        }
+        return TimeInterval(start: startTime, length: endTime - startTime);
+      } else {
+        assert(lengthStr != null);
+        int length = timeLengthFromString(lengthStr);
+        if(startTime + length > 1440) {
+          return null;
+        }
+        return TimeInterval(start: startTime, length: length);
+      }
+    }
+
+    return null;
+  }
+
+  static int timeLengthFromString(String timeLength) {
+    var match = timeLengthExp.firstMatch(timeLength);
+    if(match != null) {
+      var hourStr = match.group(1);
+      var minStr = match.group(2);
+      if(hourStr == null && minStr == null) {
+        return null;
+      }
+      if(hourStr == null) {
+        int min = int.parse(minStr);
+        if(min > 1440) {
+          // Longer than a day
+          return null;
+        }
+        return min;
+      }
+      if(minStr == null) {
+        int hour = int.parse(hourStr);
+        if(hour > 24) {
+          return null;
+        }
+        return hour * 60;
+      }
+      int hour = int.parse(hourStr);
+      int min = int.parse(minStr);
+      if(min >= 60) {
+        return null;
+      }
+      int ret = hour * 60 + min;
+      if(ret > 1440) {
+        return null;
+      }
+      return ret;
+    }
+    return null;
+  }
+
+  static int absoluteDateToday(String day) {
+    return absoluteDate(today(), day);
+  }
+
+  // Compute the absolute date that is referred to as <day> in <today>
   static int absoluteDate(int today, String day) {
     if (day == "今天") {
       return today;
@@ -169,7 +270,8 @@ class DateTimeUtils {
         }
         if (dayOfMonth > todayOfMonth) {
           int ret = yearMonthDayToInt(year, todayMonth, dayOfMonth);
-          if(yearMonthDayFromInt(ret) != year * 10000 + todayOfMonth * 100 + dayOfMonth) {
+          if (yearMonthDayFromInt(ret) !=
+              year * 10000 + todayOfMonth * 100 + dayOfMonth) {
             return null;
           }
           return ret;
@@ -178,11 +280,12 @@ class DateTimeUtils {
         // month
         var month = todayMonth % 12 + 1;
         // Bump to the next year
-        if(month == 1) {
+        if (month == 1) {
           year++;
         }
         int ret = yearMonthDayToInt(year, month, dayOfMonth);
-        if(yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
+        if (yearMonthDayFromInt(ret) !=
+            year * 10000 + month * 100 + dayOfMonth) {
           return null;
         }
         return ret;
@@ -198,7 +301,7 @@ class DateTimeUtils {
         year++;
       }
       int ret = yearMonthDayToInt(year, month, dayOfMonth);
-      if(yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
+      if (yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
         return null;
       }
       return ret;

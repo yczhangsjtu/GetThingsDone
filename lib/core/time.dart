@@ -1,19 +1,7 @@
 import 'date_time_utils.dart';
 
-class TimeOption {
-  final int start;
-  final int length;
-
-  TimeOption({this.start, this.length});
-
-  String toString() {
-    return start == null
-        ? ""
-        : DateTimeUtils.timeToString(start) +
-            (length == null
-                ? ""
-                : "到${DateTimeUtils.timeToString(start + length)}");
-  }
+class TimeOption extends TimeInterval {
+  TimeOption({int start, int length}) : super(start: start, length: length);
 }
 
 class FixedTime extends TimeOption {

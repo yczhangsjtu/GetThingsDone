@@ -68,6 +68,46 @@ void main() {
     expect(DateTimeUtils.absoluteTime("24:50"), null);
     expect(DateTimeUtils.absoluteTime("上午24:50"), null);
     expect(DateTimeUtils.absoluteTime("下午24:00"), null);
+
+    for(int i = 0; i <= 24; i++) {
+      expect(DateTimeUtils.timeLengthFromString("$i小时"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("$i小时0分钟"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("$i小时30分钟"), i < 24 ? i * 60 + 30 : null);
+      expect(DateTimeUtils.timeLengthFromString("$i小时59分钟"), i < 24 ? i * 60 + 59 : null);
+      expect(DateTimeUtils.timeLengthFromString("${i}H"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("${i}H0M"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("${i}H30M"), i < 24 ? i * 60 + 30 : null);
+      expect(DateTimeUtils.timeLengthFromString("${i}H59M"), i < 24 ? i * 60 + 59 : null);
+      expect(DateTimeUtils.timeLengthFromString("${i}h"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("${i}h0m"), i * 60);
+      expect(DateTimeUtils.timeLengthFromString("${i}h30m"), i < 24 ? i * 60 + 30 : null);
+      expect(DateTimeUtils.timeLengthFromString("${i}h59m"), i < 24 ? i * 60 + 59 : null);
+    }
+
+    for(int i = 0; i <= 60; i++) {
+      expect(DateTimeUtils.timeLengthFromString("${i}分钟"), i);
+      expect(DateTimeUtils.timeLengthFromString("${i}M"), i);
+      expect(DateTimeUtils.timeLengthFromString("${i}m"), i);
+    }
+    expect(DateTimeUtils.timeLengthFromString("1441分钟"), null);
+    expect(DateTimeUtils.timeLengthFromString("1441M"), null);
+    expect(DateTimeUtils.timeLengthFromString("1441m"), null);
+
+    expect(DateTimeUtils.absoluteTimeInterval("5:20").toString(), "5:20");
+    expect(DateTimeUtils.absoluteTimeInterval("5点20").toString(), "5:20");
+    expect(DateTimeUtils.absoluteTimeInterval("10点半").toString(), "10:30");
+    expect(DateTimeUtils.absoluteTimeInterval("10点半 0小时").toString(), "10:30到10:30");
+    expect(DateTimeUtils.absoluteTimeInterval("10点半 10小时").toString(), "10:30到20:30");
+    expect(DateTimeUtils.absoluteTimeInterval("11点半 1小时").toString(), "11:30到12:30");
+    expect(DateTimeUtils.absoluteTimeInterval("22点半 10分钟").toString(), "22:30到22:40");
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分 60分钟").toString(), "22:59到23:59");
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分 61分钟").toString(), "22:59到24:00");
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分 62分钟"), null);
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分61分钟"), null);
+    expect(DateTimeUtils.absoluteTimeInterval("10点半-11:00").toString(), "10:30到11:00");
+    expect(DateTimeUtils.absoluteTimeInterval("11点半到11:29"), null);
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分 - 下午22:59"), null);
+    expect(DateTimeUtils.absoluteTimeInterval("22点59分 到 下午10:59").toString(), "22:59到22:59");
   });
 
   test("Test string to date functions", () {
