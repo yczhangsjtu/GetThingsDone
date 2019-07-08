@@ -184,12 +184,17 @@ void main() {
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19), length: 100).toString(), "2018-1-19");
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19), start: 700).toString(), "2018-1-19 11:40");
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19), start: 700, length: 120).toString(), "2018-1-19 11:40到13:40");
+    expect(FixedTime.fromString("7月8日 10点半 1小时").toString().substring(4), "-7-8 10:30到11:30");
+    expect(FixedTime.fromString("7月8日").toString().substring(4), "-7-8");
+    expect(FixedTime.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
+    expect(FixedTime.fromString("11点半 1小时").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
 
     // Test Period
     expect(Period(PeriodType.everyWeek, 0).toString(), "每周日");
     expect(Period(PeriodType.everyWeek, 6, start: 999).toString(), "每周六16:39");
     expect(Period(PeriodType.everyDay, 1, start: 1001).toString(), "每天16:41");
     expect(Period(PeriodType.everyMonth, 1, start: 1111, length: 111).toString(), "每月1日18:31到20:22");
+
 
   });
 }

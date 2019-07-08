@@ -120,10 +120,16 @@ class DateTimeUtils {
       "($hourMinutePattern)" + // group 7 to 11
       r"|\s+(" + timeLengthPattern +"))"; // group 12, end group 6
   static final timeIntervalExp = RegExp(r"^" + timeIntervalPattern + r"$");
-  static final relativeWeekDayExp = RegExp(r"^(下{0,2})周(日|一|二|三|四|五|六)$");
-  static final monthDayExp = RegExp(r"(([1-2]?[0-9])月)?([1-3]?[0-9])(日|号)");
+
+  static final relativeWeekDayPattern = r"(下{0,2})周(日|一|二|三|四|五|六)";
+  static final relativeWeekDayExp = RegExp(r"^" + relativeWeekDayPattern + r"$");
+  static final monthDayPattern = r"(?:([1-2]?[0-9])月)?([1-3]?[0-9])(?:日|号)";
+  static final monthDayExp = RegExp(r"^" + monthDayPattern + r"$");
 
   static int absoluteTime(String time) {
+    if(time == null) {
+      return null;
+    }
     var match = hourMinuteExp.firstMatch(time);
     if (match != null) {
       String noon = match.group(1);
@@ -144,6 +150,9 @@ class DateTimeUtils {
   }
 
   static TimeInterval absoluteTimeInterval(String time) {
+    if(time == null) {
+      return null;
+    }
     int t = absoluteTime(time);
     if (t != null) {
       // This is not interval, just a time point, leave length null
@@ -179,6 +188,9 @@ class DateTimeUtils {
   }
 
   static int timeLengthFromString(String timeLength) {
+    if(timeLength == null) {
+      return null;
+    }
     var match = timeLengthExp.firstMatch(timeLength);
     if(match != null) {
       var hourStr = match.group(1);
@@ -221,6 +233,9 @@ class DateTimeUtils {
 
   // Compute the absolute date that is referred to as <day> in <today>
   static int absoluteDate(int today, String day) {
+    if(day == null) {
+      return null;
+    }
     if (day == "今天") {
       return today;
     }
@@ -255,7 +270,7 @@ class DateTimeUtils {
 
     match = monthDayExp.firstMatch(day);
     if (match != null) {
-      int dayOfMonth = int.parse(match.group(3));
+      int dayOfMonth = int.parse(match.group(2));
       if (dayOfMonth == 0) {
         return null;
       }
@@ -291,7 +306,7 @@ class DateTimeUtils {
         return ret;
       }
       // In the case the month is given
-      int month = int.parse(match.group(2));
+      int month = int.parse(match.group(1));
       if (month > 12 || month < 1) {
         return null;
       }

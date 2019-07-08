@@ -16,6 +16,30 @@ class FixedTime extends TimeOption {
     String time = super.toString();
     return DateTimeUtils.dayToString(day) + (time == "" ? "" : " $time");
   }
+
+  static final fixedTimeExp = RegExp(r"^(" + // start group 1
+      DateTimeUtils.relativeWeekDayPattern + // 2 groups
+      "|" +
+      DateTimeUtils.monthDayPattern + // 2 groups
+      r")?\s*(" + // end group 1, start group 6
+      DateTimeUtils.timeIntervalPattern +
+      r")?$");
+
+  static FixedTime fromString(String s) {
+    var match = fixedTimeExp.firstMatch(s);
+    if (match == null) {
+      return null;
+    }
+    var dateStr = match.group(1);
+    var timeStr = match.group(6);
+    if (dateStr == null && timeStr == null) {
+      return null;
+    }
+    var timeInterval = DateTimeUtils.absoluteTimeInterval(timeStr);
+    var day = DateTimeUtils.absoluteDateToday(dateStr);
+    return FixedTime(day ?? DateTimeUtils.today(),
+        start: timeInterval?.start, length: timeInterval?.length);
+  }
 }
 
 enum PeriodType {
