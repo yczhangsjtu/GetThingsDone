@@ -95,6 +95,7 @@ void main() {
 
     expect(DateTimeUtils.absoluteTimeInterval("5:20").toString(), "5:20");
     expect(DateTimeUtils.absoluteTimeInterval("5点20").toString(), "5:20");
+    expect(DateTimeUtils.absoluteTimeInterval("上午8点").toString(), "8:00");
     expect(DateTimeUtils.absoluteTimeInterval("10点半").toString(), "10:30");
     expect(DateTimeUtils.absoluteTimeInterval("10点半 0小时").toString(), "10:30到10:30");
     expect(DateTimeUtils.absoluteTimeInterval("10点半 10小时").toString(), "10:30到20:30");
@@ -186,15 +187,36 @@ void main() {
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19), start: 700, length: 120).toString(), "2018-1-19 11:40到13:40");
     expect(FixedTime.fromString("7月8日 10点半 1小时").toString().substring(4), "-7-8 10:30到11:30");
     expect(FixedTime.fromString("7月8日").toString().substring(4), "-7-8");
+    expect(FixedTime.fromString("7月8日 ").toString().substring(4), "-7-8");
     expect(FixedTime.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
     expect(FixedTime.fromString("11点半 1小时").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
+    expect(FixedTime.fromString("11点半 1小时 ").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
 
     // Test Period
     expect(Period(PeriodType.everyWeek, 0).toString(), "每周日");
     expect(Period(PeriodType.everyWeek, 6, start: 999).toString(), "每周六16:39");
     expect(Period(PeriodType.everyDay, 1, start: 1001).toString(), "每天16:41");
     expect(Period(PeriodType.everyMonth, 1, start: 1111, length: 111).toString(), "每月1日18:31到20:22");
-
-
+    expect(Period.fromString("每天").toString(), "每天");
+    expect(Period.fromString("每天8:00").toString(), "每天8:00");
+    expect(Period.fromString("每天上午8点").toString(), "每天8:00");
+    expect(Period.fromString("每天下午8点到下午8点半").toString(), "每天20:00到20:30");
+    expect(Period.fromString("每天下午8点 2小时").toString(), "每天20:00到22:00");
+    expect(Period.fromString("每天下午10点 2小时").toString(), "每天22:00到24:00");
+    expect(Period.fromString("每天下午10点 3小时"), null);
+    expect(Period.fromString("每周一").toString(), "每周一");
+    expect(Period.fromString("每周二8:00").toString(), "每周二8:00");
+    expect(Period.fromString("每周三上午8点").toString(), "每周三8:00");
+    expect(Period.fromString("每周四下午8点到下午8点半").toString(), "每周四20:00到20:30");
+    expect(Period.fromString("每周五下午8点 2小时").toString(), "每周五20:00到22:00");
+    expect(Period.fromString("每周六下午10点 2小时").toString(), "每周六22:00到24:00");
+    expect(Period.fromString("每周日下午10点 3小时"), null);
+    expect(Period.fromString("每月1日").toString(), "每月1日");
+    expect(Period.fromString("每月2号8:00").toString(), "每月2日8:00");
+    expect(Period.fromString("每月30上午8点").toString(), "每月30日8:00");
+    expect(Period.fromString("每月31号下午8点到下午8点半").toString(), "每月31日20:00到20:30");
+    expect(Period.fromString("每月29下午8点 2小时").toString(), "每月29日20:00到22:00");
+    expect(Period.fromString("每月15日下午10点 2小时").toString(), "每月15日22:00到24:00");
+    expect(Period.fromString("每月3日下午10点 3小时"), null);
   });
 }
