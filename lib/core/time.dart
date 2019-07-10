@@ -2,6 +2,10 @@ import 'date_time_utils.dart';
 
 class TimeOption extends TimeInterval {
   TimeOption({int start, int length}) : super(start: start, length: length);
+
+  static TimeOption fromString(String s) {
+    return FixedTime.fromString(s) ?? Period.fromString(s);
+  }
 }
 
 class FixedTime extends TimeOption {

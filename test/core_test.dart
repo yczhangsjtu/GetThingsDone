@@ -218,5 +218,10 @@ void main() {
     expect(Period.fromString("每月29下午8点 2小时").toString(), "每月29日20:00到22:00");
     expect(Period.fromString("每月15日下午10点 2小时").toString(), "每月15日22:00到24:00");
     expect(Period.fromString("每月3日下午10点 3小时"), null);
+
+    // Test TimeOption
+    expect(TimeOption.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
+    expect(TimeOption.fromString("每周五下午8点 2小时").toString(), "每周五20:00到22:00");
+    expect(TimeOption.fromString("每周六下午10点 2小时").toString(), "每周六22:00到24:00");
   });
 }
