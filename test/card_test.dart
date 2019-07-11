@@ -20,5 +20,6 @@ void main() {
               start: 17 * 60)
         ]).toString(),
         "看书《白鹿原》\n2019-7-11 17:00");
+    expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(), "看书《白鹿原》\n等待买到《白鹿原》这本书");
   });
 }

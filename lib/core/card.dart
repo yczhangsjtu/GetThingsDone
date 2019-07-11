@@ -55,10 +55,11 @@ class ActionCard extends Card {
     this.nextAct,
     this.importance = Importance.normal,
     this.waiting,
-  })  : assert(timeOptions?.isNotEmpty ?? false),
-        assert(!timeOptions.any((o) {
-          return o == null;
-        })),
+  })  : assert(((timeOptions?.isNotEmpty ?? false) &&
+                !timeOptions.any((o) {
+                  return o == null;
+                })) ||
+            (waiting?.isNotEmpty ?? false)),
         assert(importance != null),
         super(id, title, comments: comments);
 
@@ -66,8 +67,10 @@ class ActionCard extends Card {
   String toString() {
     StringBuffer stringBuffer = StringBuffer();
     stringBuffer.write(title);
-    stringBuffer
-        .write("\n${timeOptions.map((o) => o.toString()).toList().join("\n")}");
+    if (timeOptions?.isNotEmpty ?? false) {
+      stringBuffer.write(
+          "\n${timeOptions.map((o) => o.toString()).toList().join("\n")}");
+    }
     if (nextAct != null) {
       stringBuffer.write("\n$nextAct");
     }
@@ -93,4 +96,3 @@ class BasketCard extends Card {
   BasketCard(int id, String title, {List<String> comments})
       : super(id, title, comments: comments);
 }
-
