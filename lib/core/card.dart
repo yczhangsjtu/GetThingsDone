@@ -96,3 +96,49 @@ class BasketCard extends Card {
   BasketCard(int id, String title, {List<String> comments})
       : super(id, title, comments: comments);
 }
+
+class FilterRule {
+  final List<String> beginWithOptions;
+  final List<String> endWithOptions;
+  final bool relationIsOr;
+
+  FilterRule(
+      {this.beginWithOptions, this.endWithOptions, this.relationIsOr = false})
+
+      // For beginWithOptions and endWithOptions, they should not contain any
+      // empty string; they can be empty lists, though
+      : assert((beginWithOptions?.isEmpty ?? true) ||
+            beginWithOptions.any((s) {
+              return s?.isNotEmpty ?? false;
+            })),
+        assert((endWithOptions?.isEmpty ?? true) ||
+            endWithOptions.any((s) {
+              return s?.isNotEmpty ?? false;
+            })),
+        assert(relationIsOr != null);
+
+  bool match(String s) {
+    if (s?.isEmpty ?? true) {
+      return false;
+    }
+    bool beginWithMatch = (beginWithOptions?.isEmpty ?? true)
+        ? null
+        : beginWithOptions.any((start) {
+            return s.startsWith(start);
+          });
+    bool endWithMatch = (endWithOptions?.isEmpty ?? true)
+        ? null
+        : endWithOptions.any((end) {
+            return s.endsWith(end);
+          });
+    if (beginWithMatch == null) {
+      return endWithMatch ?? false;
+    }
+    if (endWithMatch == null) {
+      return beginWithMatch;
+    }
+    return relationIsOr
+        ? beginWithMatch || endWithMatch
+        : beginWithMatch && endWithMatch;
+  }
+}

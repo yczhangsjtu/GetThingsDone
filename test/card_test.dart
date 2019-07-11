@@ -20,6 +20,21 @@ void main() {
               start: 17 * 60)
         ]).toString(),
         "看书《白鹿原》\n2019-7-11 17:00");
-    expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(), "看书《白鹿原》\n等待买到《白鹿原》这本书");
+    expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
+        "看书《白鹿原》\n等待买到《白鹿原》这本书");
+    
+    // Test Filter Rule
+    expect(FilterRule().match(""), false);
+    expect(FilterRule().match("看书《白鹿原》"), false);
+    expect(FilterRule(beginWithOptions: ["看书"]).match("看书《白鹿原》"), true);
+    expect(FilterRule(beginWithOptions: ["看书《"]).match("看书《白鹿原》"), true);
+    expect(FilterRule(beginWithOptions: ["《"]).match("看书《白鹿原》"), false);
+    expect(FilterRule(endWithOptions: ["》"]).match("看书《白鹿原》"), true);
+    expect(FilterRule(endWithOptions: ["》书"]).match("看书《白鹿原》"), false);
+    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"]).match("看书《白鹿原》"), false);
+    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: false).match("看书《白鹿原》"), false);
+    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
+    expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: false).match("看书《白鹿原》"), true);
+    expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
   });
 }
