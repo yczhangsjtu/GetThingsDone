@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'components/bottom_navigation_scaffold.dart';
 import 'pages/basket.dart';
+import 'core/card.dart';
 
-void main() => runApp(GTDApp());
+void main() {
+  GTDCard.loadCards();
+  runApp(GTDApp());
+}
 
 class GTDApp extends StatelessWidget {
   @override

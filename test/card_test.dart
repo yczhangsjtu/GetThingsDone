@@ -7,10 +7,10 @@ import 'package:flutter_gtd/core/card.dart';
 void main() {
   test("Test card creation and toString", () {
     // Test Card toString
-    expect(Card("看书《白鹿原》").toString(), "看书《白鹿原》");
-    expect(Card("看书《白鹿原》", comments: []).toString(), "看书《白鹿原》");
-    expect(Card("洗衣服", comments: ["周日"]).toString(), "洗衣服\n周日");
-    expect(Card("洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
+    expect(GTDCard("看书《白鹿原》").toString(), "看书《白鹿原》");
+    expect(GTDCard("看书《白鹿原》", comments: []).toString(), "看书《白鹿原》");
+    expect(GTDCard("洗衣服", comments: ["周日"]).toString(), "洗衣服\n周日");
+    expect(GTDCard("洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
 
     // Test ActionCard toString
     expect(
@@ -195,7 +195,7 @@ void main() {
   });
 
   test("Test inventory update", () {
-    Card.cards = [];
+    GTDCard.cards = [];
     Inventory.inventories = <Inventory>[
       Inventory(
           "书单",
@@ -206,16 +206,16 @@ void main() {
     ];
     expect(Inventory.addInventory("购物"), true);
     expect(Inventory.addInventory("游泳"), true);
-    expect(Card.addCard(Card.fromString("洗衣服\n周日")), true);
-    expect(Card.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
-    expect(Card.addCard(Card.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
-    expect(Card.addCard(Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
-    expect(Card.addCard(Card.fromString("书《白鹿原》")), true);
-    expect(Card.cards[0] is ActionCard, true);
-    expect(Card.cards[1] is ActionCard, true);
-    expect(Card.cards[2] is InventoryCard, true);
-    expect(Card.cards[3] is InventoryCard, true);
-    expect(Card.cards[4] is BasketCard, true);
+    expect(GTDCard.addCard(GTDCard.fromString("洗衣服\n周日")), true);
+    expect(GTDCard.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
+    expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
+    expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
+    expect(GTDCard.addCard(GTDCard.fromString("书《白鹿原》")), true);
+    expect(GTDCard.cards[0] is ActionCard, true);
+    expect(GTDCard.cards[1] is ActionCard, true);
+    expect(GTDCard.cards[2] is InventoryCard, true);
+    expect(GTDCard.cards[3] is InventoryCard, true);
+    expect(GTDCard.cards[4] is BasketCard, true);
     int index = Inventory.findInventory("书单");
     Inventory.updateInventoryFilter(
         index,
@@ -223,11 +223,11 @@ void main() {
             beginWithOptions: ["书《", "《"],
             endWithOptions: ["》"],
             relationIsOr: false));
-    expect(Card.cards[0] is ActionCard, true);
-    expect(Card.cards[1] is ActionCard, true);
-    expect(Card.cards[2] is ActionCard, true);
-    expect(Card.cards[3] is ActionCard, true);
-    expect(Card.cards[4] is InventoryCard, true);
+    expect(GTDCard.cards[0] is ActionCard, true);
+    expect(GTDCard.cards[1] is ActionCard, true);
+    expect(GTDCard.cards[2] is ActionCard, true);
+    expect(GTDCard.cards[3] is ActionCard, true);
+    expect(GTDCard.cards[4] is InventoryCard, true);
   });
 
   test("Test card serialization and deserialization", () {
@@ -247,46 +247,46 @@ void main() {
     index = Inventory.findInventory("游泳");
     inventory = Inventory.inventories[index];
     inventory.filterRule = FilterRule(beginWithOptions: ["游泳要带"]);
-    var card = Card.fromString("看书《白鹿原》");
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
-    card = Card.fromString("洗衣服\n周日");
+    var card = GTDCard.fromString("看书《白鹿原》");
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
+    card = GTDCard.fromString("洗衣服\n周日");
     expect(card is ActionCard, true);
-    expect(Card.deserialize(card.serialize()) is ActionCard, true);
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
-    card = Card.fromString("洗澡\n2019-7-14 18:00\n重要");
+    expect(GTDCard.deserialize(card.serialize()) is ActionCard, true);
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
+    card = GTDCard.fromString("洗澡\n2019-7-14 18:00\n重要");
     expect(card is ActionCard, true);
-    expect(Card.deserialize(card.serialize()) is ActionCard, true);
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
-    card = Card.fromString("洗澡\n周日下午6点\n重要");
+    expect(GTDCard.deserialize(card.serialize()) is ActionCard, true);
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
+    card = GTDCard.fromString("洗澡\n周日下午6点\n重要");
     expect(card is ActionCard, true);
-    expect(Card.deserialize(card.serialize()) is ActionCard, true);
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
-    card = Card.fromString("看书《白鹿原》\n7月11日 下午5点");
+    expect(GTDCard.deserialize(card.serialize()) is ActionCard, true);
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
+    card = GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点");
     expect(card is InventoryCard, true);
-    expect(Card.deserialize(card.serialize()) is InventoryCard, true);
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
-    card = Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书");
+    expect(GTDCard.deserialize(card.serialize()) is InventoryCard, true);
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
+    card = GTDCard.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书");
     expect(card is InventoryCard, true);
-    expect(Card.deserialize(card.serialize()) is InventoryCard, true);
-    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
+    expect(GTDCard.deserialize(card.serialize()) is InventoryCard, true);
+    expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
   });
 
   test("Test load and save", () async {
-    Card.cards = null;
+    GTDCard.cards = null;
     Inventory.inventories = null;
-    expect(Card.addCard(Card.fromString("洗衣服\n周日")), true);
-    expect(Card.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
-    expect(Card.addCard(Card.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
-    expect(Card.addCard(Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
-    var s = Card.allCardsToString();
-    Card.cards = null;
-    Card.loadCardsFromString(s);
-    expect(Card.cards != null, true);
-    expect(Card.cards[0].title, "洗衣服");
-    expect(Card.cards[1].title, "洗澡");
-    expect((Card.cards[1] as ActionCard).importance, Importance.considerable);
-    expect(Card.cards[2].title, "看书《白鹿原》");
-    expect(Card.cards[3].title, "看书《白鹿原》");
-    expect((Card.cards[3] as ActionCard).waiting, "等待买到《白鹿原》这本书");
+    expect(GTDCard.addCard(GTDCard.fromString("洗衣服\n周日")), true);
+    expect(GTDCard.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
+    expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
+    expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
+    var s = GTDCard.allCardsToString();
+    GTDCard.cards = null;
+    GTDCard.loadCardsFromString(s);
+    expect(GTDCard.cards != null, true);
+    expect(GTDCard.cards[0].title, "洗衣服");
+    expect(GTDCard.cards[1].title, "洗澡");
+    expect((GTDCard.cards[1] as ActionCard).importance, Importance.considerable);
+    expect(GTDCard.cards[2].title, "看书《白鹿原》");
+    expect(GTDCard.cards[3].title, "看书《白鹿原》");
+    expect((GTDCard.cards[3] as ActionCard).waiting, "等待买到《白鹿原》这本书");
   });
 }

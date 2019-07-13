@@ -5,18 +5,18 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'time.dart';
 
-class Card {
+class GTDCard {
   final String title;
   final List<String> comments;
-  static List<Card> cards;
+  static List<GTDCard> cards;
 
-  Card(this.title, {this.comments});
+  GTDCard(this.title, {this.comments});
 
   String toString() {
     return "$title${CardUtils.listIsNullOrEmpty(comments) ? "" : "\n" + comments.join("\n")}";
   }
 
-  static Card fromString(String s) {
+  static GTDCard fromString(String s) {
     return InventoryCard.fromString(s) ??
         ActionCard.fromString(s) ??
         BasketCard.fromString(s);
@@ -26,11 +26,11 @@ class Card {
     return CardUtils.encodeBase64String(toString());
   }
 
-  static Card deserialize(String s) {
+  static GTDCard deserialize(String s) {
     return fromString(CardUtils.decodeBase64String(s));
   }
 
-  static bool addCard(Card card) {
+  static bool addCard(GTDCard card) {
     cards = cards ?? [];
     if (card == null) {
       return false;
@@ -52,9 +52,12 @@ class Card {
   static void loadCardsFromString(String s) {
     cards = cards ?? [];
     cards.clear();
+    if(CardUtils.stringIsNullOrEmpty(s)) {
+      return;
+    }
     var lines = s.split("\n");
     for (int i = 0; i < lines.length; i++) {
-      var card = Card.deserialize(lines[i]);
+      var card = GTDCard.deserialize(lines[i]);
       addCard(card);
     }
   }
@@ -146,7 +149,7 @@ class CardUtils {
   }
 }
 
-class ActionCard extends Card {
+class ActionCard extends GTDCard {
   final List<TimeOption> timeOptions;
   final String nextAct;
   final Importance importance;
@@ -246,7 +249,7 @@ class ActionCard extends Card {
   }
 }
 
-class InventoryCard extends Card {
+class InventoryCard extends GTDCard {
   InventoryCard(String title, {List<String> comments})
       : super(title, comments: comments);
 
@@ -274,7 +277,7 @@ class InventoryCard extends Card {
   }
 }
 
-class BasketCard extends Card {
+class BasketCard extends GTDCard {
   BasketCard(String title, {List<String> comments})
       : super(title, comments: comments);
 
@@ -425,8 +428,8 @@ class Inventory {
     }
     Inventory inventory = inventories[index];
     List<int> cardsToUpdate = [];
-    for (int i = 0; i < Card.cards.length; i++) {
-      Card card = Card.cards[i];
+    for (int i = 0; i < GTDCard.cards.length; i++) {
+      GTDCard card = GTDCard.cards[i];
       if ((card is InventoryCard &&
               inventory.filterRule.match(card.title) &&
               !filterRule.match(card.title)) ||
@@ -436,8 +439,8 @@ class Inventory {
     }
     inventory.filterRule = filterRule;
     for (int i = 0; i < cardsToUpdate.length; i++) {
-      Card card = Card.cards[cardsToUpdate[i]];
-      Card.cards[cardsToUpdate[i]] = Card.fromString(card.toString());
+      GTDCard card = GTDCard.cards[cardsToUpdate[i]];
+      GTDCard.cards[cardsToUpdate[i]] = GTDCard.fromString(card.toString());
     }
     return true;
   }
