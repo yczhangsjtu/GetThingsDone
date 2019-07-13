@@ -40,6 +40,33 @@ class CardUtils {
     }
     return null;
   }
+
+  static importanceFromString(String s) {
+    if (s == "极重要") {
+      return Importance.extreme;
+    }
+    if (s == "很重要") {
+      return Importance.high;
+    }
+    if (s == "重要") {
+      return Importance.considerable;
+    }
+    if (s == "一般") {
+      return Importance.normal;
+    }
+    if (s == "不重要") {
+      return Importance.none;
+    }
+    return null;
+  }
+
+  static encodeBase64String(String s) {
+    return base64Encode(utf8.encode(s));
+  }
+
+  static decodeBase64String(String s) {
+    return utf8.decode(base64Decode(s));
+  }
 }
 
 class ActionCard extends Card {
@@ -178,8 +205,9 @@ class FilterRule {
             return utf8.decode(base64Decode(s));
           }).toList();
     if (beginWithOptions?.any((s) {
-      return s?.isEmpty ?? true;
-    }) ?? false) {
+          return s?.isEmpty ?? true;
+        }) ??
+        false) {
       return null;
     }
     var endWithOptions = endWithStr.isEmpty
@@ -188,8 +216,9 @@ class FilterRule {
             return utf8.decode(base64Decode(s));
           }).toList();
     if (endWithOptions?.any((s) {
-      return s?.isEmpty ?? true;
-    }) ?? false) {
+          return s?.isEmpty ?? true;
+        }) ??
+        false) {
       return null;
     }
     return FilterRule(
@@ -197,4 +226,20 @@ class FilterRule {
         endWithOptions: endWithOptions,
         relationIsOr: relationIsOr);
   }
+}
+
+class Inventory {
+  String name;
+  FilterRule filterRule;
+  final List<int> cards;
+
+  Inventory(this.name, this.filterRule, this.cards)
+      : assert(name?.isNotEmpty ?? false),
+        assert(cards != null);
+
+  String serialize() {
+
+  }
+
+  static List<Inventory> inventories;
 }
