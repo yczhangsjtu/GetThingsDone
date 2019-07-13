@@ -221,7 +221,48 @@ class Inventory {
 
   Inventory(this.name, this.filterRule, this.cards)
       : assert(!CardUtils.stringIsNullOrEmpty(name)),
+        assert(filterRule != null),
         assert(cards != null);
 
   static List<Inventory> inventories;
+
+  static int firstMatchingInventory(String s) {
+    if (CardUtils.stringIsNullOrEmpty(s)) {
+      return null;
+    }
+    inventories = inventories ?? <Inventory>[];
+    for(int i = 0; i < inventories.length; i++) {
+      if(inventories[i].filterRule.match(s)) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  static bool addInventory(String name) {
+    if(CardUtils.stringIsNullOrEmpty(name)) {
+      return false;
+    }
+    inventories = inventories ?? <Inventory>[];
+    for(int i = 0; i < inventories.length; i++) {
+      if(inventories[i].name == name) {
+        return false;
+      }
+    }
+    inventories.add(Inventory(name, FilterRule(), []));
+    return true;
+  }
+
+  static int findInventory(String name) {
+    inventories = inventories ?? <Inventory>[];
+    if(CardUtils.stringIsNullOrEmpty(name)) {
+      return null;
+    }
+    for(int i = 0; i < inventories.length; i++) {
+      if(inventories[i].name == name) {
+        return i;
+      }
+    }
+    return null;
+  }
 }

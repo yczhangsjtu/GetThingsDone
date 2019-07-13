@@ -22,7 +22,9 @@ void main() {
         "看书《白鹿原》\n2019-7-11 17:00");
     expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
         "看书《白鹿原》\n等待买到《白鹿原》这本书");
+  });
 
+  test("Test util functions", () {
     // Test Importance
     expect(CardUtils.importanceToString(Importance.extreme), "极重要");
     expect(CardUtils.importanceToString(Importance.high), "很重要");
@@ -40,7 +42,9 @@ void main() {
     expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("a")), "a");
     expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文")), "中文");
     expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文\nabc")), "中文\nabc");
+  });
 
+  test("Test filter rules and inventories", () {
     // Test Filter Rule
     expect(FilterRule().match(""), false);
     expect(FilterRule().match("看书《白鹿原》"), false);
@@ -68,5 +72,33 @@ void main() {
     expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
     expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《", "看书《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
 
+    // Test Inventories
+    Inventory.inventories = <Inventory> [
+      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false), []),
+    ];
+    expect(Inventory.addInventory(""), false);
+    expect(Inventory.inventories.length, 1);
+    expect(Inventory.addInventory("购物"), true);
+    expect(Inventory.inventories.length, 2);
+    expect(Inventory.addInventory("购物"), false);
+    expect(Inventory.inventories.length, 2);
+    expect(Inventory.addInventory("游泳"), true);
+    expect(Inventory.inventories.length, 3);
+    int index = Inventory.findInventory("");
+    expect(index, null);
+    index = Inventory.findInventory("看书");
+    expect(index, null);
+    index = Inventory.findInventory("购物");
+    expect(index, 1);
+    var inventory = Inventory.inventories[index];
+    inventory.filterRule = FilterRule(beginWithOptions: ["买"]);
+    index = Inventory.findInventory("游泳");
+    expect(index, 2);
+    inventory = Inventory.inventories[index];
+    inventory.filterRule = FilterRule(beginWithOptions: ["游泳要带"]);
+    expect(Inventory.firstMatchingInventory("看书《白鹿原》"), 0);
+    expect(Inventory.firstMatchingInventory("买书《白鹿原》"), 1);
+    expect(Inventory.firstMatchingInventory("游泳要带泳衣"), 2);
+    expect(Inventory.firstMatchingInventory("要买衣服"), null);
   });
 }
