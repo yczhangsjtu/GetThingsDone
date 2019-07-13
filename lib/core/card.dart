@@ -44,12 +44,11 @@ class Card {
 
   static String allCardsToString() {
     cards = cards ?? {};
-    return cards.values
-        .map((card) {
-          return card.serialize();
-        })
-        .toList()
-        .join("\n");
+    var keys = cards.keys.toList();
+    keys.sort();
+    return keys.map((id) {
+      return cards[id].serialize();
+    }).toList().join("\n");
   }
 
   static void loadCardsFromString(String s) {

@@ -120,6 +120,8 @@ void main() {
     expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
     card = ActionCard.fromString("洗衣服\n周日");
     expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
+    card = ActionCard.fromString("洗澡\n2019-7-14 18:00\n重要");
+    expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
     card = ActionCard.fromString("洗澡\n周日下午6点\n重要");
     expect(card.serialize(), Card.deserialize(card.serialize()).serialize());
     card = ActionCard.fromString("看书《白鹿原》\n7月11日 下午5点");
@@ -130,14 +132,20 @@ void main() {
 
   test("Test load and save", () async {
     Card.cards = null;
+    Inventory.inventories = null;
     expect(Card.addCard(Card.fromString("洗衣服\n周日")), true);
-    expect(Card.addCard(Card.fromString("洗澡\n周日下午6点\n重要")), true);
+    expect(Card.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
     expect(Card.addCard(Card.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
     expect(Card.addCard(Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
     var s = Card.allCardsToString();
     Card.cards = null;
     Card.loadCardsFromString(s);
     expect(Card.cards != null, true);
-    expect(Card.cards.length, 4);
+    expect(Card.cards[0].title, "洗衣服");
+    expect(Card.cards[1].title, "洗澡");
+    expect((Card.cards[1] as ActionCard).importance, Importance.considerable);
+    expect(Card.cards[2].title, "看书《白鹿原》");
+    expect(Card.cards[3].title, "看书《白鹿原》");
+    expect((Card.cards[3] as ActionCard).waiting, "等待买到《白鹿原》这本书");
   });
 }

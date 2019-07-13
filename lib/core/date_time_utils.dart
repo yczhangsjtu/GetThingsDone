@@ -125,6 +125,8 @@ class DateTimeUtils {
   static final relativeWeekDayExp = RegExp(r"^" + relativeWeekDayPattern + r"$");
   static final monthDayPattern = r"(?:([1-2]?[0-9])月)?([1-3]?[0-9])(?:日|号)";
   static final monthDayExp = RegExp(r"^" + monthDayPattern + r"$");
+  static final yearMonthDayPattern = "([1-2][0-9][0-9][0-9])-([1-2]?[0-9])-([1-3]?[0-9])";
+  static final yearMonthDayExp = RegExp(r"^" + yearMonthDayPattern + r"$");
 
   static int absoluteTime(String time) {
     if(time == null) {
@@ -317,6 +319,18 @@ class DateTimeUtils {
       }
       int ret = yearMonthDayToInt(year, month, dayOfMonth);
       if (yearMonthDayFromInt(ret) != year * 10000 + month * 100 + dayOfMonth) {
+        return null;
+      }
+      return ret;
+    }
+
+    match = yearMonthDayExp.firstMatch(day);
+    if(match != null) {
+      int year = int.parse(match.group(1));
+      int month = int.parse(match.group(2));
+      int day = int.parse(match.group(3));
+      int ret = yearMonthDayToInt(year, month, day);
+      if(yearMonthDayFromInt(ret) != year * 10000 + month * 100 + day) {
         return null;
       }
       return ret;

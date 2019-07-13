@@ -194,6 +194,7 @@ void main() {
     expect(FixedTime.fromString("11点半 1小时 ").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
     expect(FixedTime.fromString("周日下午6点") != null, true);
     expect(FixedTime.fromString("7月11日 下午5点") != null, true);
+    expect(FixedTime.fromString("2019-7-14 18:00") != null, true);
 
     // Test Period
     expect(Period(PeriodType.everyWeek, 0).toString(), "每周日");
@@ -225,6 +226,7 @@ void main() {
     // Test TimeOption
     expect(TimeOption.fromString("周日下午6点") != null, true);
     expect(TimeOption.fromString("7月11日 下午5点") != null, true);
+    expect(TimeOption.fromString("2019-7-14 18:00") != null, true);
     expect(TimeOption.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
     expect(TimeOption.fromString("每周五下午8点 2小时").toString(), "每周五20:00到22:00");
     expect(TimeOption.fromString("每周六下午10点 2小时").toString(), "每周六22:00到24:00");

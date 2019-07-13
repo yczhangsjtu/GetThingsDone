@@ -25,7 +25,9 @@ class FixedTime extends TimeOption {
       DateTimeUtils.relativeWeekDayPattern + // 2 groups
       "|" +
       DateTimeUtils.monthDayPattern + // 2 groups
-      r")?\s*(" + // end group 1, start group 6
+      "|" +
+      DateTimeUtils.yearMonthDayPattern + // 3 groups
+      r")?\s*(" + // end group 1, start group 9
       DateTimeUtils.timeIntervalPattern +
       "|" +
       DateTimeUtils.hourMinutePattern +
@@ -37,7 +39,7 @@ class FixedTime extends TimeOption {
       return null;
     }
     var dateStr = match.group(1);
-    var timeStr = match.group(6);
+    var timeStr = match.group(9);
     if (dateStr == null && timeStr == null) {
       return null;
     }
