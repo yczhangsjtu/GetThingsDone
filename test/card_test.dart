@@ -195,7 +195,7 @@ void main() {
   });
 
   test("Test inventory update", () {
-    GTDCard.cards = [];
+    GTDCard.resetCards();
     Inventory.inventories = <Inventory>[
       Inventory(
           "书单",
@@ -272,14 +272,14 @@ void main() {
   });
 
   test("Test load and save", () async {
-    GTDCard.cards = null;
+    GTDCard.resetCards();
     Inventory.inventories = null;
     expect(GTDCard.addCard(GTDCard.fromString("洗衣服\n周日")), true);
     expect(GTDCard.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
     expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
     expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
     var s = GTDCard.allCardsToString();
-    GTDCard.cards = null;
+    GTDCard.resetCards();
     GTDCard.loadCardsFromString(s);
     expect(GTDCard.cards != null, true);
     expect(GTDCard.cards[0].title, "洗衣服");

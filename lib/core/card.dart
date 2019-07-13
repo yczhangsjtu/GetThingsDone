@@ -8,7 +8,11 @@ import 'time.dart';
 class GTDCard {
   final String title;
   final List<String> comments;
-  static List<GTDCard> cards;
+  static List<GTDCard> get cards {
+    _cards = _cards ?? [];
+    return _cards;
+  }
+  static List<GTDCard> _cards;
 
   GTDCard(this.title, {this.comments});
 
@@ -31,7 +35,6 @@ class GTDCard {
   }
 
   static bool addCard(GTDCard card) {
-    cards = cards ?? [];
     if (card == null) {
       return false;
     }
@@ -39,8 +42,28 @@ class GTDCard {
     return true;
   }
 
+  static bool removeBasketCard(int index) {
+    int count = -1;
+    if(index < 0) {
+      return false;
+    }
+    int i = 0;
+    for(; i < cards.length; i++) {
+      if(cards[i] is BasketCard) {
+        count++;
+        if(count == index) {
+          break;
+        }
+      }
+    }
+    if(count == index) {
+      _cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
   static String allCardsToString() {
-    cards = cards ?? {};
     return cards
         .map((card) {
           return card.serialize();
@@ -50,7 +73,6 @@ class GTDCard {
   }
 
   static void loadCardsFromString(String s) {
-    cards = cards ?? [];
     cards.clear();
     if(CardUtils.stringIsNullOrEmpty(s)) {
       return;
@@ -62,11 +84,20 @@ class GTDCard {
     }
   }
 
-  static loadCards() async {
-    final file = await _localFile;
-    var s = await file.readAsString();
-    print(s);
-    loadCardsFromString(s);
+  static void resetCards() {
+    _cards = _cards ?? [];
+  }
+
+  static Future loadCards() async {
+    try {
+      final file = await _localFile;
+      print(file);
+      var s = await file.readAsString();
+      print(s);
+      loadCardsFromString(s);
+    } catch (e) {
+      loadCardsFromString("");
+    }
   }
 
   static saveCards() async {
