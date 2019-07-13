@@ -434,6 +434,7 @@ class Inventory {
         cardsToUpdate.add(i);
       }
     }
+    inventory.filterRule = filterRule;
     for (int i = 0; i < cardsToUpdate.length; i++) {
       Card card = Card.cards[cardsToUpdate[i]];
       Card.cards[cardsToUpdate[i]] = Card.fromString(card.toString());

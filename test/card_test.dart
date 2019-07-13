@@ -10,8 +10,7 @@ void main() {
     expect(Card("看书《白鹿原》").toString(), "看书《白鹿原》");
     expect(Card("看书《白鹿原》", comments: []).toString(), "看书《白鹿原》");
     expect(Card("洗衣服", comments: ["周日"]).toString(), "洗衣服\n周日");
-    expect(
-        Card("洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
+    expect(Card("洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
 
     // Test ActionCard toString
     expect(
@@ -22,7 +21,6 @@ void main() {
         "看书《白鹿原》\n2019-7-11 17:00");
     expect(ActionCard("看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
         "看书《白鹿原》\n等待买到《白鹿原》这本书");
-
   });
 
   test("Test util functions", () {
@@ -40,9 +38,13 @@ void main() {
 
     // Test Base64 Encode and Decode
     expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("")), "");
-    expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("a")), "a");
-    expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文")), "中文");
-    expect(CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文\nabc")), "中文\nabc");
+    expect(
+        CardUtils.decodeBase64String(CardUtils.encodeBase64String("a")), "a");
+    expect(
+        CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文")), "中文");
+    expect(
+        CardUtils.decodeBase64String(CardUtils.encodeBase64String("中文\nabc")),
+        "中文\nabc");
   });
 
   test("Test filter rules and inventories", () {
@@ -54,28 +56,117 @@ void main() {
     expect(FilterRule(beginWithOptions: ["《"]).match("看书《白鹿原》"), false);
     expect(FilterRule(endWithOptions: ["》"]).match("看书《白鹿原》"), true);
     expect(FilterRule(endWithOptions: ["》书"]).match("看书《白鹿原》"), false);
-    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"]).match("看书《白鹿原》"), false);
-    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: false).match("看书《白鹿原》"), false);
-    expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
-    expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: false).match("看书《白鹿原》"), true);
-    expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
+    expect(
+        FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"])
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule(
+                beginWithOptions: ["《"],
+                endWithOptions: ["》"],
+                relationIsOr: false)
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule(
+                beginWithOptions: ["《"],
+                endWithOptions: ["》"],
+                relationIsOr: true)
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule(
+                beginWithOptions: ["看书《"],
+                endWithOptions: ["》"],
+                relationIsOr: false)
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule(
+                beginWithOptions: ["看书《"],
+                endWithOptions: ["》"],
+                relationIsOr: true)
+            .match("看书《白鹿原》"),
+        true);
     expect(FilterRule.deserialize(FilterRule().serialize()).match(""), false);
-    expect(FilterRule.deserialize(FilterRule().serialize()).match("看书《白鹿原》"), false);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书"]).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"]).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"]).serialize()).match("看书《白鹿原》"), false);
-    expect(FilterRule.deserialize(FilterRule(endWithOptions: ["》"]).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(endWithOptions: ["》书"]).serialize()).match("看书《白鹿原》"), false);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"]).serialize()).match("看书《白鹿原》"), false);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: false).serialize()).match("看书《白鹿原》"), false);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: false).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
-    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《", "看书《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule().serialize()).match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule.deserialize(FilterRule(beginWithOptions: ["看书"]).serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(
+                FilterRule(beginWithOptions: ["看书《"]).serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(FilterRule(beginWithOptions: ["《"]).serialize())
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule.deserialize(FilterRule(endWithOptions: ["》"]).serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(FilterRule(endWithOptions: ["》书"]).serialize())
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule.deserialize(
+                FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"])
+                    .serialize())
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule.deserialize(FilterRule(
+                    beginWithOptions: ["《"],
+                    endWithOptions: ["》"],
+                    relationIsOr: false)
+                .serialize())
+            .match("看书《白鹿原》"),
+        false);
+    expect(
+        FilterRule.deserialize(FilterRule(
+                    beginWithOptions: ["《"],
+                    endWithOptions: ["》"],
+                    relationIsOr: true)
+                .serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(FilterRule(
+                    beginWithOptions: ["看书《"],
+                    endWithOptions: ["》"],
+                    relationIsOr: false)
+                .serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(FilterRule(
+                    beginWithOptions: ["看书《"],
+                    endWithOptions: ["》"],
+                    relationIsOr: true)
+                .serialize())
+            .match("看书《白鹿原》"),
+        true);
+    expect(
+        FilterRule.deserialize(FilterRule(
+                    beginWithOptions: ["《", "看书《"],
+                    endWithOptions: ["》"],
+                    relationIsOr: true)
+                .serialize())
+            .match("看书《白鹿原》"),
+        true);
 
     // Test Inventories
-    Inventory.inventories = <Inventory> [
-      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false)),
+    Inventory.inventories = <Inventory>[
+      Inventory(
+          "书单",
+          FilterRule(
+              beginWithOptions: ["看书《", "《"],
+              endWithOptions: ["》"],
+              relationIsOr: false)),
     ];
     expect(Inventory.addInventory(""), false);
     expect(Inventory.inventories.length, 1);
@@ -103,10 +194,47 @@ void main() {
     expect(Inventory.firstMatchingInventory("要买衣服"), null);
   });
 
+  test("Test inventory update", () {
+    Card.cards = [];
+    Inventory.inventories = <Inventory>[
+      Inventory(
+          "书单",
+          FilterRule(
+              beginWithOptions: ["看书《", "《"],
+              endWithOptions: ["》"],
+              relationIsOr: false)),
+    ];
+    expect(Inventory.addInventory("购物"), true);
+    expect(Inventory.addInventory("游泳"), true);
+    expect(Card.addCard(Card.fromString("洗衣服\n周日")), true);
+    expect(Card.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
+    expect(Card.addCard(Card.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
+    expect(Card.addCard(Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
+    expect(Card.cards[0] is ActionCard, true);
+    expect(Card.cards[1] is ActionCard, true);
+    expect(Card.cards[2] is InventoryCard, true);
+    expect(Card.cards[3] is InventoryCard, true);
+    int index = Inventory.findInventory("书单");
+    Inventory.updateInventoryFilter(
+        index,
+        FilterRule(
+            beginWithOptions: ["书《", "《"],
+            endWithOptions: ["》"],
+            relationIsOr: false));
+    expect(Card.cards[0] is ActionCard, true);
+    expect(Card.cards[1] is ActionCard, true);
+    expect(Card.cards[2] is ActionCard, true);
+    expect(Card.cards[3] is ActionCard, true);
+  });
+
   test("Test card serialization and deserialization", () {
-    // Test Inventories
-    Inventory.inventories = <Inventory> [
-      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false)),
+    Inventory.inventories = <Inventory>[
+      Inventory(
+          "书单",
+          FilterRule(
+              beginWithOptions: ["看书《", "《"],
+              endWithOptions: ["》"],
+              relationIsOr: false)),
     ];
     expect(Inventory.addInventory("购物"), true);
     expect(Inventory.addInventory("游泳"), true);
