@@ -9,7 +9,7 @@ class Card {
   Card(this.id, this.title, {this.comments});
 
   String toString() {
-    return "$title${comments?.isEmpty ?? true ? "" : "\n" + comments.join("\n")}";
+    return "$title${CardUtils.listIsNullOrEmpty(comments) ? "" : "\n" + comments.join("\n")}";
   }
 }
 
@@ -60,12 +60,20 @@ class CardUtils {
     return null;
   }
 
-  static encodeBase64String(String s) {
+  static String encodeBase64String(String s) {
     return base64Encode(utf8.encode(s));
   }
 
-  static decodeBase64String(String s) {
+  static String decodeBase64String(String s) {
     return utf8.decode(base64Decode(s));
+  }
+
+  static bool stringIsNullOrEmpty(dynamic s) {
+    return s?.isEmpty ?? true;
+  }
+
+  static bool listIsNullOrEmpty(List s) {
+    return s?.isEmpty ?? true;
   }
 }
 
@@ -83,11 +91,11 @@ class ActionCard extends Card {
     this.nextAct,
     this.importance = Importance.normal,
     this.waiting,
-  })  : assert(((timeOptions?.isNotEmpty ?? false) &&
+  })  : assert((!CardUtils.listIsNullOrEmpty(timeOptions) &&
                 !timeOptions.any((o) {
                   return o == null;
                 })) ||
-            (waiting?.isNotEmpty ?? false)),
+            !CardUtils.stringIsNullOrEmpty(waiting)),
         assert(importance != null),
         super(id, title, comments: comments);
 
@@ -95,7 +103,7 @@ class ActionCard extends Card {
   String toString() {
     StringBuffer stringBuffer = StringBuffer();
     stringBuffer.write(title);
-    if (timeOptions?.isNotEmpty ?? false) {
+    if (!CardUtils.listIsNullOrEmpty(timeOptions)) {
       stringBuffer.write(
           "\n${timeOptions.map((o) => o.toString()).toList().join("\n")}");
     }
@@ -108,7 +116,7 @@ class ActionCard extends Card {
     if (waiting != null) {
       stringBuffer.write("\n$waiting");
     }
-    if (comments?.isNotEmpty ?? false) {
+    if (!CardUtils.listIsNullOrEmpty(comments)) {
       stringBuffer.write("\n${comments.join("\n")}");
     }
     return stringBuffer.toString();
@@ -135,30 +143,22 @@ class FilterRule {
 
       // For beginWithOptions and endWithOptions, they should not contain any
       // empty string; they can be empty lists, though
-      : assert((beginWithOptions?.isEmpty ?? true) ||
-            beginWithOptions.any((s) {
-              return s?.isNotEmpty ?? false;
-            })),
-        assert((endWithOptions?.isEmpty ?? true) ||
-            endWithOptions.any((s) {
-              return s?.isNotEmpty ?? false;
-            })),
+      : assert(CardUtils.listIsNullOrEmpty(beginWithOptions) ||
+            !beginWithOptions.any(CardUtils.stringIsNullOrEmpty)),
+        assert(CardUtils.listIsNullOrEmpty(endWithOptions) ||
+            !endWithOptions.any(CardUtils.stringIsNullOrEmpty)),
         assert(relationIsOr != null);
 
   bool match(String s) {
-    if (s?.isEmpty ?? true) {
+    if (CardUtils.stringIsNullOrEmpty(s)) {
       return false;
     }
-    bool beginWithMatch = (beginWithOptions?.isEmpty ?? true)
+    bool beginWithMatch = CardUtils.listIsNullOrEmpty(beginWithOptions)
         ? null
-        : beginWithOptions.any((start) {
-            return s.startsWith(start);
-          });
-    bool endWithMatch = (endWithOptions?.isEmpty ?? true)
+        : beginWithOptions.any(s.startsWith);
+    bool endWithMatch = CardUtils.listIsNullOrEmpty(endWithOptions)
         ? null
-        : endWithOptions.any((end) {
-            return s.endsWith(end);
-          });
+        : endWithOptions.any(s.endsWith);
     if (beginWithMatch == null) {
       return endWithMatch ?? false;
     }
@@ -173,15 +173,11 @@ class FilterRule {
   String serialize() {
     return (beginWithOptions == null
             ? ""
-            : beginWithOptions.map((s) {
-                return base64Encode(utf8.encode(s));
-              }).join(",")) +
+            : beginWithOptions.map(CardUtils.encodeBase64String).join(",")) +
         ";" +
         (endWithOptions == null
             ? ""
-            : endWithOptions.map((s) {
-                return base64Encode(utf8.encode(s));
-              }).join(",")) +
+            : endWithOptions.map(CardUtils.encodeBase64String).join(",")) +
         ";" +
         (relationIsOr ? "0" : "1");
   }
@@ -201,24 +197,14 @@ class FilterRule {
     }
     var beginWithOptions = beginWithStr.isEmpty
         ? null
-        : beginWithStr.split(",").map((s) {
-            return utf8.decode(base64Decode(s));
-          }).toList();
-    if (beginWithOptions?.any((s) {
-          return s?.isEmpty ?? true;
-        }) ??
-        false) {
+        : beginWithStr.split(",").map(CardUtils.decodeBase64String).toList();
+    if (beginWithOptions?.any(CardUtils.stringIsNullOrEmpty) ?? false) {
       return null;
     }
     var endWithOptions = endWithStr.isEmpty
         ? null
-        : endWithStr.split(",").map((s) {
-            return utf8.decode(base64Decode(s));
-          }).toList();
-    if (endWithOptions?.any((s) {
-          return s?.isEmpty ?? true;
-        }) ??
-        false) {
+        : endWithStr.split(",").map(CardUtils.decodeBase64String).toList();
+    if (endWithOptions?.any(CardUtils.stringIsNullOrEmpty) ?? false) {
       return null;
     }
     return FilterRule(
@@ -234,12 +220,8 @@ class Inventory {
   final List<int> cards;
 
   Inventory(this.name, this.filterRule, this.cards)
-      : assert(name?.isNotEmpty ?? false),
+      : assert(!CardUtils.stringIsNullOrEmpty(name)),
         assert(cards != null);
-
-  String serialize() {
-
-  }
 
   static List<Inventory> inventories;
 }
