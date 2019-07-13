@@ -27,6 +27,8 @@ class FixedTime extends TimeOption {
       DateTimeUtils.monthDayPattern + // 2 groups
       r")?\s*(" + // end group 1, start group 6
       DateTimeUtils.timeIntervalPattern +
+      "|" +
+      DateTimeUtils.hourMinutePattern +
       r")?\s*$");
 
   static FixedTime fromString(String s) {
@@ -39,10 +41,21 @@ class FixedTime extends TimeOption {
     if (dateStr == null && timeStr == null) {
       return null;
     }
-    var timeInterval = DateTimeUtils.absoluteTimeInterval(timeStr);
     var day = DateTimeUtils.absoluteDateToday(dateStr);
-    return FixedTime(day ?? DateTimeUtils.today(),
-        start: timeInterval?.start, length: timeInterval?.length);
+    if(timeStr == null) {
+      return FixedTime(day);
+    }
+    var absoluteTime = DateTimeUtils.absoluteTime(timeStr);
+    if (absoluteTime != null) {
+      return FixedTime(day ?? DateTimeUtils.today(), start: absoluteTime);
+    }
+    var timeInterval = DateTimeUtils.absoluteTimeInterval(timeStr);
+    if (timeInterval != null) {
+      return FixedTime(day ?? DateTimeUtils.today(),
+          start: timeInterval?.start, length: timeInterval?.length);
+    }
+    assert(false);
+    return null;
   }
 }
 
@@ -76,7 +89,8 @@ class Period extends TimeOption {
 
   static final periodExp = RegExp(
       r"^每(天|日|周(日|一|二|三|四|五|六)|月([1-3]?[0-9])(?:日|号)?)\s*(" + // 3 groups, start group 4
-          DateTimeUtils.timeIntervalPattern + "|" +
+          DateTimeUtils.timeIntervalPattern +
+          "|" +
           DateTimeUtils.hourMinutePattern +
           r")?\s*$");
 
@@ -88,9 +102,10 @@ class Period extends TimeOption {
     var dateStr = match.group(1);
     var timeStr = match.group(4);
     var dayStr = match.group(3);
-    var timeInterval =
-        timeStr == null ? TimeInterval() : DateTimeUtils.absoluteTimeInterval(timeStr);
-    if(timeInterval == null) {
+    var timeInterval = timeStr == null
+        ? TimeInterval()
+        : DateTimeUtils.absoluteTimeInterval(timeStr);
+    if (timeInterval == null) {
       return null;
     }
     var periodType = PeriodType.everyDay;
@@ -99,14 +114,15 @@ class Period extends TimeOption {
       periodType = PeriodType.everyWeek;
       day = DateTimeUtils.dayOfWeekByName(dateStr[1]);
       assert(day != null);
-    } else if(dateStr.startsWith("月")) {
+    } else if (dateStr.startsWith("月")) {
       periodType = PeriodType.everyMonth;
       day = int.parse(dayStr);
       assert(day != null);
-      if(day < 1 || day > 31) {
+      if (day < 1 || day > 31) {
         return null;
       }
     }
-    return Period(periodType, day, start: timeInterval.start, length: timeInterval.length);
+    return Period(periodType, day,
+        start: timeInterval.start, length: timeInterval.length);
   }
 }

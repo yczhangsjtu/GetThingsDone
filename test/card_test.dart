@@ -22,6 +22,7 @@ void main() {
         "看书《白鹿原》\n2019-7-11 17:00");
     expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
         "看书《白鹿原》\n等待买到《白鹿原》这本书");
+
   });
 
   test("Test util functions", () {
@@ -100,5 +101,30 @@ void main() {
     expect(Inventory.firstMatchingInventory("买书《白鹿原》"), 1);
     expect(Inventory.firstMatchingInventory("游泳要带泳衣"), 2);
     expect(Inventory.firstMatchingInventory("要买衣服"), null);
+  });
+
+  test("Test card serialization and deserialization", () {
+    // Test Inventories
+    Inventory.inventories = <Inventory> [
+      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false), []),
+    ];
+    expect(Inventory.addInventory("购物"), true);
+    expect(Inventory.addInventory("游泳"), true);
+    int index = Inventory.findInventory("购物");
+    var inventory = Inventory.inventories[index];
+    inventory.filterRule = FilterRule(beginWithOptions: ["买"]);
+    index = Inventory.findInventory("游泳");
+    inventory = Inventory.inventories[index];
+    inventory.filterRule = FilterRule(beginWithOptions: ["游泳要带"]);
+    var card = Card.fromString("看书《白鹿原》");
+    expect(card.serialize(), card.deserialize(card.serialize()).serialize());
+    card = ActionCard.fromString("洗衣服\n周日");
+    expect(card.serialize(), card.deserialize(card.serialize()).serialize());
+    card = ActionCard.fromString("洗澡\n周日下午6点\n重要");
+    expect(card.serialize(), card.deserialize(card.serialize()).serialize());
+    card = ActionCard.fromString("看书《白鹿原》\n7月11日 下午5点");
+    expect(card.serialize(), card.deserialize(card.serialize()).serialize());
+    card = ActionCard.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书");
+    expect(card.serialize(), card.deserialize(card.serialize()).serialize());
   });
 }

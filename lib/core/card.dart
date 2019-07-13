@@ -6,10 +6,27 @@ class Card {
   final String title;
   final List<String> comments;
 
+  static List<Card> cards;
+  static int _nextId = 0;
+
   Card(this.id, this.title, {this.comments});
 
   String toString() {
     return "$title${CardUtils.listIsNullOrEmpty(comments) ? "" : "\n" + comments.join("\n")}";
+  }
+
+  static Card fromString(String s) {
+    return InventoryCard.fromString(s) ??
+        ActionCard.fromString(s) ??
+        BasketCard.fromString(s);
+  }
+
+  String serialize() {
+    return CardUtils.encodeBase64String(toString());
+  }
+
+  Card deserialize(String s) {
+    return fromString(CardUtils.decodeBase64String(s));
   }
 }
 
@@ -121,16 +138,113 @@ class ActionCard extends Card {
     }
     return stringBuffer.toString();
   }
+
+  @override
+  String serialize() {
+    return CardUtils.encodeBase64String(toString());
+  }
+
+  static ActionCard fromString(String s) {
+    var lines = s.split("\n");
+    String title;
+    String waiting;
+    String nextAct;
+    Importance importance;
+    List<TimeOption> timeOptions = <TimeOption>[];
+    List<String> comments = <String>[];
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].trim().isNotEmpty) {
+        if (title == null) {
+          title = lines[i];
+          continue;
+        }
+        var timeOption = TimeOption.fromString(lines[i]);
+        if (timeOption != null) {
+          timeOptions.add(timeOption);
+          continue;
+        }
+        if (lines[i].startsWith("等待") && waiting == null) {
+          waiting = lines[i];
+          continue;
+        }
+        if (lines[i].startsWith("下一步") && nextAct == null) {
+          nextAct = lines[i];
+          continue;
+        }
+        if (importance == null) {
+          importance = CardUtils.importanceFromString(lines[i]);
+          if (importance != null) {
+            continue;
+          }
+        }
+        comments.add(lines[i]);
+      }
+    }
+    if (title == null) {
+      return null;
+    }
+    if (waiting != null || timeOptions.isNotEmpty) {
+      return ActionCard(Card._nextId++, title,
+          waiting: waiting,
+          nextAct: nextAct,
+          timeOptions: timeOptions,
+          importance: importance ?? Importance.normal,
+          comments: comments);
+    }
+    return null;
+  }
 }
 
 class InventoryCard extends Card {
   InventoryCard(int id, String title, {List<String> comments})
       : super(id, title, comments: comments);
+
+  static InventoryCard fromString(String s) {
+    var lines = s.split("\n");
+    String title;
+    List<String> comments = [];
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].trim().isNotEmpty) {
+        if (title == null) {
+          if (Inventory.firstMatchingInventory(lines[i]) != null) {
+            title = lines[i];
+            continue;
+          } else {
+            return null;
+          }
+        }
+        comments.add(lines[i]);
+      }
+    }
+    if (title == null) {
+      return null;
+    }
+    return InventoryCard(Card._nextId++, title, comments: comments);
+  }
 }
 
 class BasketCard extends Card {
   BasketCard(int id, String title, {List<String> comments})
       : super(id, title, comments: comments);
+
+  static BasketCard fromString(String s) {
+    var lines = s.split("\n");
+    String title;
+    List<String> comments = [];
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].trim().isNotEmpty) {
+        if (title == null) {
+          title = lines[i];
+          continue;
+        }
+        comments.add(lines[i]);
+      }
+    }
+    if (title == null) {
+      return null;
+    }
+    return BasketCard(Card._nextId++, title, comments: comments);
+  }
 }
 
 class FilterRule {
@@ -231,8 +345,8 @@ class Inventory {
       return null;
     }
     inventories = inventories ?? <Inventory>[];
-    for(int i = 0; i < inventories.length; i++) {
-      if(inventories[i].filterRule.match(s)) {
+    for (int i = 0; i < inventories.length; i++) {
+      if (inventories[i].filterRule.match(s)) {
         return i;
       }
     }
@@ -240,12 +354,12 @@ class Inventory {
   }
 
   static bool addInventory(String name) {
-    if(CardUtils.stringIsNullOrEmpty(name)) {
+    if (CardUtils.stringIsNullOrEmpty(name)) {
       return false;
     }
     inventories = inventories ?? <Inventory>[];
-    for(int i = 0; i < inventories.length; i++) {
-      if(inventories[i].name == name) {
+    for (int i = 0; i < inventories.length; i++) {
+      if (inventories[i].name == name) {
         return false;
       }
     }
@@ -255,11 +369,11 @@ class Inventory {
 
   static int findInventory(String name) {
     inventories = inventories ?? <Inventory>[];
-    if(CardUtils.stringIsNullOrEmpty(name)) {
+    if (CardUtils.stringIsNullOrEmpty(name)) {
       return null;
     }
-    for(int i = 0; i < inventories.length; i++) {
-      if(inventories[i].name == name) {
+    for (int i = 0; i < inventories.length; i++) {
+      if (inventories[i].name == name) {
         return i;
       }
     }
