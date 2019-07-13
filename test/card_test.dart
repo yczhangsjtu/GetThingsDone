@@ -7,20 +7,20 @@ import 'package:flutter_gtd/core/card.dart';
 void main() {
   test("Test card creation and toString", () {
     // Test Card toString
-    expect(Card(0, "看书《白鹿原》").toString(), "看书《白鹿原》");
-    expect(Card(0, "看书《白鹿原》", comments: []).toString(), "看书《白鹿原》");
-    expect(Card(1, "洗衣服", comments: ["周日"]).toString(), "洗衣服\n周日");
+    expect(Card("看书《白鹿原》").toString(), "看书《白鹿原》");
+    expect(Card("看书《白鹿原》", comments: []).toString(), "看书《白鹿原》");
+    expect(Card("洗衣服", comments: ["周日"]).toString(), "洗衣服\n周日");
     expect(
-        Card(2, "洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
+        Card("洗澡", comments: ["周日下午6点", "重要"]).toString(), "洗澡\n周日下午6点\n重要");
 
     // Test ActionCard toString
     expect(
-        ActionCard(0, "看书《白鹿原》", timeOptions: [
+        ActionCard("看书《白鹿原》", timeOptions: [
           FixedTime(DateTimeUtils.yearMonthDayToInt(2019, 7, 11),
               start: 17 * 60)
         ]).toString(),
         "看书《白鹿原》\n2019-7-11 17:00");
-    expect(ActionCard(0, "看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
+    expect(ActionCard("看书《白鹿原》", waiting: "等待买到《白鹿原》这本书").toString(),
         "看书《白鹿原》\n等待买到《白鹿原》这本书");
 
   });
@@ -75,7 +75,7 @@ void main() {
 
     // Test Inventories
     Inventory.inventories = <Inventory> [
-      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false), []),
+      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false)),
     ];
     expect(Inventory.addInventory(""), false);
     expect(Inventory.inventories.length, 1);
@@ -106,7 +106,7 @@ void main() {
   test("Test card serialization and deserialization", () {
     // Test Inventories
     Inventory.inventories = <Inventory> [
-      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false), []),
+      Inventory("书单", FilterRule(beginWithOptions: ["看书《", "《"], endWithOptions: ["》"], relationIsOr: false)),
     ];
     expect(Inventory.addInventory("购物"), true);
     expect(Inventory.addInventory("游泳"), true);
@@ -157,9 +157,5 @@ void main() {
     expect(Card.cards[2].title, "看书《白鹿原》");
     expect(Card.cards[3].title, "看书《白鹿原》");
     expect((Card.cards[3] as ActionCard).waiting, "等待买到《白鹿原》这本书");
-    expect(Card.cards[0].id, 0);
-    expect(Card.cards[1].id, 1);
-    expect(Card.cards[2].id, 2);
-    expect(Card.cards[3].id, 3);
   });
 }

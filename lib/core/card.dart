@@ -6,14 +6,11 @@ import 'dart:convert';
 import 'time.dart';
 
 class Card {
-  final int id;
   final String title;
   final List<String> comments;
+  static List<Card> cards;
 
-  static Map<int, Card> cards;
-  static int _nextId = 0;
-
-  Card(this.id, this.title, {this.comments});
+  Card(this.title, {this.comments});
 
   String toString() {
     return "$title${CardUtils.listIsNullOrEmpty(comments) ? "" : "\n" + comments.join("\n")}";
@@ -34,29 +31,29 @@ class Card {
   }
 
   static bool addCard(Card card) {
-    cards = cards ?? {};
-    if(card == null) {
+    cards = cards ?? [];
+    if (card == null) {
       return false;
     }
-    cards[card.id] = card;
+    cards.add(card);
     return true;
   }
 
   static String allCardsToString() {
     cards = cards ?? {};
-    var keys = cards.keys.toList();
-    keys.sort();
-    return keys.map((id) {
-      return cards[id].serialize();
-    }).toList().join("\n");
+    return cards
+        .map((card) {
+          return card.serialize();
+        })
+        .toList()
+        .join("\n");
   }
 
   static void loadCardsFromString(String s) {
-    cards = cards ?? {};
+    cards = cards ?? [];
     cards.clear();
-    _nextId = 0;
     var lines = s.split("\n");
-    for(int i = 0; i < lines.length; i++) {
+    for (int i = 0; i < lines.length; i++) {
       var card = Card.deserialize(lines[i]);
       addCard(card);
     }
@@ -156,7 +153,6 @@ class ActionCard extends Card {
   final String waiting;
 
   ActionCard(
-    int id,
     String title, {
     this.timeOptions,
     List<String> comments,
@@ -169,7 +165,7 @@ class ActionCard extends Card {
                 })) ||
             !CardUtils.stringIsNullOrEmpty(waiting)),
         assert(importance != null),
-        super(id, title, comments: comments);
+        super(title, comments: comments);
 
   @override
   String toString() {
@@ -239,7 +235,7 @@ class ActionCard extends Card {
       return null;
     }
     if (waiting != null || timeOptions.isNotEmpty) {
-      return ActionCard(Card._nextId++, title,
+      return ActionCard(title,
           waiting: waiting,
           nextAct: nextAct,
           timeOptions: timeOptions,
@@ -251,8 +247,8 @@ class ActionCard extends Card {
 }
 
 class InventoryCard extends Card {
-  InventoryCard(int id, String title, {List<String> comments})
-      : super(id, title, comments: comments);
+  InventoryCard(String title, {List<String> comments})
+      : super(title, comments: comments);
 
   static InventoryCard fromString(String s) {
     var lines = s.split("\n");
@@ -274,13 +270,13 @@ class InventoryCard extends Card {
     if (title == null) {
       return null;
     }
-    return InventoryCard(Card._nextId++, title, comments: comments);
+    return InventoryCard(title, comments: comments);
   }
 }
 
 class BasketCard extends Card {
-  BasketCard(int id, String title, {List<String> comments})
-      : super(id, title, comments: comments);
+  BasketCard(String title, {List<String> comments})
+      : super(title, comments: comments);
 
   static BasketCard fromString(String s) {
     var lines = s.split("\n");
@@ -298,7 +294,7 @@ class BasketCard extends Card {
     if (title == null) {
       return null;
     }
-    return BasketCard(Card._nextId++, title, comments: comments);
+    return BasketCard(title, comments: comments);
   }
 }
 
@@ -386,12 +382,10 @@ class FilterRule {
 class Inventory {
   String name;
   FilterRule filterRule;
-  final List<int> cards;
 
-  Inventory(this.name, this.filterRule, this.cards)
+  Inventory(this.name, this.filterRule)
       : assert(!CardUtils.stringIsNullOrEmpty(name)),
-        assert(filterRule != null),
-        assert(cards != null);
+        assert(filterRule != null);
 
   static List<Inventory> inventories;
 
@@ -418,9 +412,32 @@ class Inventory {
         return false;
       }
     }
-    Inventory inventory = Inventory(name, FilterRule(), []);
+    Inventory inventory = Inventory(name, FilterRule());
     inventories.add(inventory);
 
+    return true;
+  }
+
+  static bool updateInventoryFilter(int index, FilterRule filterRule) {
+    inventories = inventories ?? <Inventory>[];
+    if (index < 0 || index >= inventories.length) {
+      return false;
+    }
+    Inventory inventory = inventories[index];
+    List<int> cardsToUpdate = [];
+    for (int i = 0; i < Card.cards.length; i++) {
+      Card card = Card.cards[i];
+      if ((card is InventoryCard &&
+              inventory.filterRule.match(card.title) &&
+              !filterRule.match(card.title)) ||
+          filterRule.match(card.title)) {
+        cardsToUpdate.add(i);
+      }
+    }
+    for (int i = 0; i < cardsToUpdate.length; i++) {
+      Card card = Card.cards[cardsToUpdate[i]];
+      Card.cards[cardsToUpdate[i]] = Card.fromString(card.toString());
+    }
     return true;
   }
 
