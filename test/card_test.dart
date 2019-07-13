@@ -210,10 +210,12 @@ void main() {
     expect(Card.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
     expect(Card.addCard(Card.fromString("看书《白鹿原》\n7月11日 下午5点")), true);
     expect(Card.addCard(Card.fromString("看书《白鹿原》\n等待买到《白鹿原》这本书")), true);
+    expect(Card.addCard(Card.fromString("书《白鹿原》")), true);
     expect(Card.cards[0] is ActionCard, true);
     expect(Card.cards[1] is ActionCard, true);
     expect(Card.cards[2] is InventoryCard, true);
     expect(Card.cards[3] is InventoryCard, true);
+    expect(Card.cards[4] is BasketCard, true);
     int index = Inventory.findInventory("书单");
     Inventory.updateInventoryFilter(
         index,
@@ -225,6 +227,7 @@ void main() {
     expect(Card.cards[1] is ActionCard, true);
     expect(Card.cards[2] is ActionCard, true);
     expect(Card.cards[3] is ActionCard, true);
+    expect(Card.cards[4] is InventoryCard, true);
   });
 
   test("Test card serialization and deserialization", () {
