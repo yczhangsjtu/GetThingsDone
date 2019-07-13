@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+
 import 'dart:convert';
 import 'time.dart';
 
@@ -6,7 +10,7 @@ class Card {
   final String title;
   final List<String> comments;
 
-  static List<Card> cards;
+  static Map<int, Card> cards;
   static int _nextId = 0;
 
   Card(this.id, this.title, {this.comments});
@@ -25,8 +29,60 @@ class Card {
     return CardUtils.encodeBase64String(toString());
   }
 
-  Card deserialize(String s) {
+  static Card deserialize(String s) {
     return fromString(CardUtils.decodeBase64String(s));
+  }
+
+  static bool addCard(Card card) {
+    cards = cards ?? {};
+    if(card == null) {
+      return false;
+    }
+    cards[card.id] = card;
+    return true;
+  }
+
+  static String allCardsToString() {
+    cards = cards ?? {};
+    return cards.values
+        .map((card) {
+          return card.serialize();
+        })
+        .toList()
+        .join("\n");
+  }
+
+  static void loadCardsFromString(String s) {
+    cards = cards ?? {};
+    cards.clear();
+    _nextId = 0;
+    var lines = s.split("\n");
+    for(int i = 0; i < lines.length; i++) {
+      var card = Card.deserialize(lines[i]);
+      cards[_nextId++] = card;
+    }
+  }
+
+  static loadCards() async {
+    final file = await _localFile;
+    var s = await file.readAsString();
+    print(s);
+    loadCardsFromString(s);
+  }
+
+  static saveCards() async {
+    final file = await _localFile;
+    await file.writeAsString(allCardsToString());
+  }
+
+  static Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/cards');
+  }
+
+  static Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 }
 
