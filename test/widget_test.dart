@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_gtd/main.dart';
+import 'package:flutter_gtd/core/card.dart';
 
 void main() {
   testWidgets('Smoke test', (WidgetTester tester) async {
+    GTDCard.loadCardsFromString("");
     // Build our app and trigger a frame.
     await tester.pumpWidget(GTDApp());
 
