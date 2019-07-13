@@ -36,5 +36,18 @@ void main() {
     expect(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
     expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: false).match("看书《白鹿原》"), true);
     expect(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule().serialize()).match(""), false);
+    expect(FilterRule.deserialize(FilterRule().serialize()).match("看书《白鹿原》"), false);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书"]).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"]).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"]).serialize()).match("看书《白鹿原》"), false);
+    expect(FilterRule.deserialize(FilterRule(endWithOptions: ["》"]).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule(endWithOptions: ["》书"]).serialize()).match("看书《白鹿原》"), false);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"]).serialize()).match("看书《白鹿原》"), false);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: false).serialize()).match("看书《白鹿原》"), false);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: false).serialize()).match("看书《白鹿原》"), true);
+    expect(FilterRule.deserialize(FilterRule(beginWithOptions: ["看书《"], endWithOptions: ["》"], relationIsOr: true).serialize()).match("看书《白鹿原》"), true);
+
   });
 }

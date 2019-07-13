@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'time.dart';
 
 class Card {
@@ -140,5 +141,60 @@ class FilterRule {
     return relationIsOr
         ? beginWithMatch || endWithMatch
         : beginWithMatch && endWithMatch;
+  }
+
+  String serialize() {
+    return (beginWithOptions == null
+            ? ""
+            : beginWithOptions.map((s) {
+                return base64Encode(utf8.encode(s));
+              }).join(",")) +
+        ";" +
+        (endWithOptions == null
+            ? ""
+            : endWithOptions.map((s) {
+                return base64Encode(utf8.encode(s));
+              }).join(",")) +
+        ";" +
+        (relationIsOr ? "0" : "1");
+  }
+
+  static FilterRule deserialize(String s) {
+    var list = s.split(";");
+    if (list.length != 3) {
+      return null;
+    }
+    var beginWithStr = list[0];
+    var endWithStr = list[1];
+    var relationStr = list[2];
+    var relationIsOr =
+        relationStr == "0" ? true : (relationStr == "1" ? false : null);
+    if (relationIsOr == null) {
+      return null;
+    }
+    var beginWithOptions = beginWithStr.isEmpty
+        ? null
+        : beginWithStr.split(",").map((s) {
+            return utf8.decode(base64Decode(s));
+          }).toList();
+    if (beginWithOptions?.any((s) {
+      return s?.isEmpty ?? true;
+    }) ?? false) {
+      return null;
+    }
+    var endWithOptions = endWithStr.isEmpty
+        ? null
+        : endWithStr.split(",").map((s) {
+            return utf8.decode(base64Decode(s));
+          }).toList();
+    if (endWithOptions?.any((s) {
+      return s?.isEmpty ?? true;
+    }) ?? false) {
+      return null;
+    }
+    return FilterRule(
+        beginWithOptions: beginWithOptions,
+        endWithOptions: endWithOptions,
+        relationIsOr: relationIsOr);
   }
 }
