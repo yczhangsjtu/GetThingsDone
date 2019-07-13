@@ -418,7 +418,9 @@ class Inventory {
         return false;
       }
     }
-    inventories.add(Inventory(name, FilterRule(), []));
+    Inventory inventory = Inventory(name, FilterRule(), []);
+    inventories.add(inventory);
+
     return true;
   }
 

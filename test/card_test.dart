@@ -157,5 +157,9 @@ void main() {
     expect(Card.cards[2].title, "看书《白鹿原》");
     expect(Card.cards[3].title, "看书《白鹿原》");
     expect((Card.cards[3] as ActionCard).waiting, "等待买到《白鹿原》这本书");
+    expect(Card.cards[0].id, 0);
+    expect(Card.cards[1].id, 1);
+    expect(Card.cards[2].id, 2);
+    expect(Card.cards[3].id, 3);
   });
 }
