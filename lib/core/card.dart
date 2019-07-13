@@ -59,7 +59,7 @@ class Card {
     var lines = s.split("\n");
     for(int i = 0; i < lines.length; i++) {
       var card = Card.deserialize(lines[i]);
-      cards[_nextId++] = card;
+      addCard(card);
     }
   }
 
