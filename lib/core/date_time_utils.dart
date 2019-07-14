@@ -121,6 +121,7 @@ class DateTimeUtils {
       r"|\s+(" + timeLengthPattern +"))"; // group 12, end group 6
   static final timeIntervalExp = RegExp(r"^" + timeIntervalPattern + r"$");
 
+  static final relativeDayPattern = r"今天|明天|后天|大后天";
   static final relativeWeekDayPattern = r"(下{0,2})周(日|一|二|三|四|五|六)";
   static final relativeWeekDayExp = RegExp(r"^" + relativeWeekDayPattern + r"$");
   static final monthDayPattern = r"(?:([1-2]?[0-9])月)?([1-3]?[0-9])(?:日|号)";

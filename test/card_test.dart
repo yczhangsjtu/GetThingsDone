@@ -260,6 +260,9 @@ void main() {
     card = GTDCard.fromString("洗澡\n周日下午6点\n重要");
     expect(card is ActionCard, true);
     expect(GTDCard.deserialize(card.serialize()) is ActionCard, true);
+    card = GTDCard.fromString("洗澡\n今天下午6点\n重要");
+    expect(card is ActionCard, true);
+    expect(GTDCard.deserialize(card.serialize()) is ActionCard, true);
     expect(card.serialize(), GTDCard.deserialize(card.serialize()).serialize());
     card = GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点");
     expect(card is InventoryCard, true);

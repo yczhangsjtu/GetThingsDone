@@ -8,13 +8,13 @@ void main() {
   GTDCard.loadCards().then((e) {
     runApp(GTDApp());
   }).then((e) {
-/*    GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n已看到第15页"));
+    GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n等待买来《白鹿原》"));
     GTDCard.addCard(GTDCard.fromString("买书《白鹿原》"));
     GTDCard.addCard(GTDCard.fromString("洗衣服"));
-    GTDCard.addCard(GTDCard.fromString("洗澡\n今天晚上\n重要"));
-    GTDCard.addCard(GTDCard.fromString("买书《穷查理宝典》\n去新华书店"));
-    GTDCard.addCard(GTDCard.fromString("买书《苏菲的世界》\n去图书大厦\n很重要"));
-    GTDCard.addCard(GTDCard.fromString("去参加会议\n逸夫楼200号"));*/
+    GTDCard.addCard(GTDCard.fromString("洗澡\n今天下午7点\n重要"));
+    GTDCard.addCard(GTDCard.fromString("买书《穷查理宝典》\n明天上午8点\n去新华书店"));
+    GTDCard.addCard(GTDCard.fromString("买书《苏菲的世界》\n下午5点\n去图书大厦\n很重要"));
+    GTDCard.addCard(GTDCard.fromString("去参加会议\n逸夫楼200号\n下午3点30"));
   });
 }
 

@@ -228,6 +228,7 @@ void main() {
     expect(TimeOption.fromString("7月11日 下午5点") != null, true);
     expect(TimeOption.fromString("2019-7-14 18:00") != null, true);
     expect(TimeOption.fromString("7月11日 下午5点") != null, true);
+    expect(TimeOption.fromString("今天下午6点") != null, true);
     expect(TimeOption.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
     expect(TimeOption.fromString("每周五下午8点 2小时").toString(), "每周五20:00到22:00");
     expect(TimeOption.fromString("每周六下午10点 2小时").toString(), "每周六22:00到24:00");

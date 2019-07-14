@@ -22,6 +22,8 @@ class FixedTime extends TimeOption {
   }
 
   static final fixedTimeExp = RegExp(r"^(" + // start group 1
+      DateTimeUtils.relativeDayPattern +
+      "|" +
       DateTimeUtils.relativeWeekDayPattern + // 2 groups
       "|" +
       DateTimeUtils.monthDayPattern + // 2 groups
