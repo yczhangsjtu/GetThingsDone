@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'components/bottom_navigation_scaffold.dart';
+import 'core/card.dart';
 import 'pages/basket.dart';
 import 'pages/actions.dart';
-import 'core/card.dart';
+import 'pages/calendar.dart';
 import 'pages/card.dart';
 
 void main() {
@@ -31,7 +32,7 @@ class GTDAppState extends State<GTDApp> {
           BottomNavigationItem(
               icon: Icon(Icons.directions_run), title: "行动", page: Actions()),
           BottomNavigationItem(
-              icon: Icon(Icons.calendar_today), title: "日历", page: Text("日历")),
+              icon: Icon(Icons.calendar_today), title: "日历", page: Calendar()),
           BottomNavigationItem(
               icon: Icon(Icons.format_list_bulleted),
               title: "清单",

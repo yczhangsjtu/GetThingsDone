@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
+import 'package:flutter_gtd/core/date_time_utils.dart';
 import 'styles.dart';
 
 typedef Future<dynamic> OnGTDCardCallback(dynamic card);
 
-Widget buildCard(
-    BuildContext context,
-    GTDCard card,
-    TextEditingController controller,
+Widget buildCard(BuildContext context, GTDCard card,
+    {TextEditingController controller,
     FocusNode focusNode,
     OnGTDCardCallback onGTDCardCallback,
-    VoidCallback onRemoveCallback) {
+    VoidCallback onRemoveCallback,
+    int restrictedToDay}) {
+  assert(
+      onGTDCardCallback == null || (controller != null && focusNode != null));
   Widget comments = card.comments.isEmpty
       ? Container()
       : Column(
@@ -18,14 +20,22 @@ Widget buildCard(
           children: card.comments.map((s) {
             return Text(s, style: kCommentStyle);
           }).toList());
-  Widget timeOptions =
-      (card is ActionCard && (card.timeOptions?.isNotEmpty ?? false))
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: card.timeOptions.map((timeOption) {
-                return Text(timeOption.toString(), style: kTimeOptionStyle);
-              }).toList())
-          : Container();
+  Widget timeOptions = (card is ActionCard &&
+          (card.timeOptions?.isNotEmpty ?? false))
+      ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: card.timeOptions.where((timeOption) {
+            return restrictedToDay == null || timeOption.match(restrictedToDay);
+          }).map((timeOption) {
+            return Text(
+                restrictedToDay == null
+                    ? timeOption.toString()
+                    : TimeInterval(
+                            start: timeOption.start, length: timeOption.length)
+                        .toString(),
+                style: kTimeOptionStyle);
+          }).toList())
+      : Container();
   Widget waiting = (card is ActionCard && card.waiting != null)
       ? Text(card.waiting, style: kWaitingStyle)
       : Container();
@@ -56,26 +66,30 @@ Widget buildCard(
         width: 80,
         child: Row(
           children: <Widget>[
-            InkWell(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.edit, size: 24),
-                ),
-                onTap: () {
-                  controller.text = card.toString();
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return buildCardEditingDialog(
-                            context, controller, focusNode);
-                      }).then(onGTDCardCallback);
-                }),
-            InkWell(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.delete, size: 24),
-                ),
-                onTap: onRemoveCallback),
+            onGTDCardCallback == null
+                ? Container()
+                : InkWell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.edit, size: 24),
+                    ),
+                    onTap: () {
+                      controller.text = card.toString();
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return buildCardEditingDialog(
+                                context, controller, focusNode);
+                          }).then(onGTDCardCallback);
+                    }),
+            onRemoveCallback == null
+                ? Container()
+                : InkWell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.delete, size: 24),
+                    ),
+                    onTap: onRemoveCallback),
           ],
         )),
   );

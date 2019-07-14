@@ -18,7 +18,7 @@ void main() {
     await tester.pump();
 
     expect(find.text("收集箱"), findsOneWidget);
-    expect(find.text('日历'), findsNWidgets(2));
+    expect(find.text('日历'), findsNWidgets(3));
     expect(find.text('清单'), findsOneWidget);
   });
 }

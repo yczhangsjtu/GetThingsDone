@@ -4,7 +4,6 @@ import 'styles.dart';
 import 'card.dart';
 
 class Basket extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return _BasketState();
@@ -36,14 +35,16 @@ class _BasketState extends State<Basket> {
   }
 
   Widget _buildCard(BuildContext context, int index) {
-    return buildCard(context, cards[index], _controller, _focusNode, (card) {
+    return buildCard(context, cards[index],
+        controller: _controller,
+        focusNode: _focusNode, onGTDCardCallback: (card) {
       if (card != null) {
-        if(GTDCard.updateBasketCard(index, card)) {
+        if (GTDCard.updateBasketCard(index, card)) {
           setState(() {});
           GTDCard.saveCards();
         }
       }
-    }, () {
+    }, onRemoveCallback: () {
       if (GTDCard.removeBasketCard(index)) {
         setState(() {});
         GTDCard.saveCards();

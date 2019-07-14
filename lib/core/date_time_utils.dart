@@ -294,7 +294,7 @@ class DateTimeUtils {
         if (dayOfMonth > todayOfMonth) {
           int ret = yearMonthDayToInt(year, todayMonth, dayOfMonth);
           if (yearMonthDayFromInt(ret) !=
-              year * 10000 + todayOfMonth * 100 + dayOfMonth) {
+              year * 10000 + todayMonth * 100 + dayOfMonth) {
             return null;
           }
           return ret;

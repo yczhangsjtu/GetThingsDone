@@ -60,6 +60,11 @@ final TextStyle kInactiveTabStyle = TextStyle(
   fontSize: 18,
 );
 
+final TextStyle kCalendarDateStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 24,
+);
+
 Color importanceToColor(Importance importance) {
   if (importance == Importance.extreme) {
     return Colors.red;

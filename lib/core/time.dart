@@ -1,11 +1,13 @@
 import 'date_time_utils.dart';
 
-class TimeOption extends TimeInterval {
+abstract class TimeOption extends TimeInterval {
   TimeOption({int start, int length}) : super(start: start, length: length);
 
   static TimeOption fromString(String s) {
     return FixedTime.fromString(s) ?? Period.fromString(s);
   }
+
+  bool match(int dayOfInterest);
 }
 
 class FixedTime extends TimeOption {
@@ -61,6 +63,12 @@ class FixedTime extends TimeOption {
     assert(false);
     return null;
   }
+
+  @override
+  bool match(int dayOfInterest) {
+    return day == dayOfInterest;
+  }
+
 }
 
 enum PeriodType {
@@ -128,5 +136,19 @@ class Period extends TimeOption {
     }
     return Period(periodType, day,
         start: timeInterval.start, length: timeInterval.length);
+  }
+
+  @override
+  bool match(int dayOfInterest) {
+    if(periodType == PeriodType.everyDay) {
+      return true;
+    }
+    if(periodType == PeriodType.everyWeek) {
+      return DateTimeUtils.dayOfWeek(dayOfInterest) == day;
+    }
+    if(periodType == PeriodType.everyMonth) {
+      return DateTimeUtils.yearMonthDayFromInt(dayOfInterest) % 100 == day;
+    }
+    return false;
   }
 }

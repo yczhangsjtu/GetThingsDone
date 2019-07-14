@@ -173,14 +173,6 @@ void main() {
   });
 
   test("Test time", () {
-
-    // Test TimeOption
-    expect(TimeOption().toString(), "");
-    expect(TimeOption(length: 10).toString(), "");
-    expect(TimeOption(start: 10).toString(), "0:10");
-    expect(TimeOption(start: 650).toString(), "10:50");
-    expect(TimeOption(start: 600, length: 200).toString(), "10:00到13:20");
-
     // Test FixedTime
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19)).toString(), "2018-1-19");
     expect(FixedTime(DateTimeUtils.yearMonthDayToInt(2018, 1, 19), length: 100).toString(), "2018-1-19");
@@ -192,6 +184,7 @@ void main() {
     expect(FixedTime.fromString("10点半 1小时").toString().endsWith(" 10:30到11:30"), true);
     expect(FixedTime.fromString("11点半 1小时").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
     expect(FixedTime.fromString("11点半 1小时 ").toString(), DateTimeUtils.dayToString(DateTimeUtils.today()) + " 11:30到12:30");
+    expect(FixedTime.fromString("18日").toString().endsWith("-18"), true);
     expect(FixedTime.fromString("周日下午6点") != null, true);
     expect(FixedTime.fromString("7月11日 下午5点") != null, true);
     expect(FixedTime.fromString("2019-7-14 18:00") != null, true);

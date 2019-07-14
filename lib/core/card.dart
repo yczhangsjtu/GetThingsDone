@@ -223,7 +223,7 @@ enum Importance {
 }
 
 class CardUtils {
-  static importanceToString(Importance importance) {
+  static String importanceToString(Importance importance) {
     if (importance == Importance.extreme) {
       return "极重要";
     }
@@ -242,7 +242,7 @@ class CardUtils {
     return null;
   }
 
-  static importanceFromString(String s) {
+  static Importance importanceFromString(String s) {
     if (s == "极重要") {
       return Importance.extreme;
     }

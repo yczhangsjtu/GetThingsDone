@@ -97,9 +97,9 @@ class _ActionsState extends State<Actions> {
   }
 
   Widget _buildCard(BuildContext context, int index) {
-    return buildCard(
-        context, cardLists[currentIndex][index], _controller, _focusNode,
-        (card) {
+    return buildCard(context, cardLists[currentIndex][index],
+        controller: _controller,
+        focusNode: _focusNode, onGTDCardCallback: (card) {
       if (card != null) {
         bool updated = false;
         if (currentIndex == 0) {
@@ -114,7 +114,7 @@ class _ActionsState extends State<Actions> {
           GTDCard.saveCards();
         }
       }
-    }, () {
+    }, onRemoveCallback: () {
       bool removed = false;
       if (currentIndex == 0) {
         removed = GTDCard.removeArrangedActionCard(index);
