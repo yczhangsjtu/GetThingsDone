@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
 import 'styles.dart';
+import 'card.dart';
 
 class Basket extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _BasketState();
@@ -11,6 +13,8 @@ class Basket extends StatefulWidget {
 
 class _BasketState extends State<Basket> {
   List<GTDCard> cards;
+  TextEditingController _controller = TextEditingController();
+  FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -32,50 +36,17 @@ class _BasketState extends State<Basket> {
   }
 
   Widget _buildCard(BuildContext context, int index) {
-    Widget comments = cards.isEmpty
-        ? Container()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: cards[index].comments.map((s) {
-              return Text(s, style: kCommentStyle);
-            }).toList());
-    Widget child = ListTile(
-      title: Text(cards[index].title, style: kCardTitleStyle),
-      subtitle: comments,
-      trailing: Container(
-          width: 80,
-          child: Row(
-            children: <Widget>[
-              InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(Icons.edit, size: 24),
-                  ),
-                  onTap: () {}),
-              InkWell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(Icons.delete, size: 24),
-                  ),
-                  onTap: () {
-                    if (GTDCard.removeBasketCard(index)) {
-                      setState(() {});
-                      GTDCard.saveCards();
-                    }
-                  }),
-            ],
-          )),
-    );
-    child = Padding(
-        padding: EdgeInsets.only(left: 20, right: 5, top: 5, bottom: 10),
-        child: child);
-    return Card(
-      color: kBasketCardColor,
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-      ),
-      child: child,
-    );
+    return buildCard(context, cards[index], _controller, _focusNode, (card) {
+      if (card != null) {
+        GTDCard.updateBasketCard(index, card);
+        setState(() {});
+        GTDCard.saveCards();
+      }
+    }, () {
+      if (GTDCard.removeBasketCard(index)) {
+        setState(() {});
+        GTDCard.saveCards();
+      }
+    });
   }
 }

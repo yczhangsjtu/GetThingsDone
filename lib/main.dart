@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/bottom_navigation_scaffold.dart';
 import 'pages/basket.dart';
 import 'core/card.dart';
+import 'pages/card.dart';
 
 void main() {
   GTDCard.loadCards().then((e) {
@@ -17,23 +18,48 @@ void main() {
   });
 }
 
-class GTDApp extends StatelessWidget {
+class GTDApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return GTDAppState();
+  }
+
+}
+
+class GTDAppState extends State<GTDApp> {
   @override
   Widget build(BuildContext context) {
-    Widget home = BottomNavigationScaffold(
-      items: <BottomNavigationItem>[
-        BottomNavigationItem(
-            icon: Icon(Icons.archive), title: "收集箱", page: Basket()),
-        BottomNavigationItem(
-            icon: Icon(Icons.directions_run), title: "行动", page: Text("行动")),
-        BottomNavigationItem(
-            icon: Icon(Icons.calendar_today), title: "日历", page: Text("日历")),
-        BottomNavigationItem(
-            icon: Icon(Icons.format_list_bulleted),
-            title: "清单",
-            page: Text("清单")),
-      ],
-    );
+    Basket basket = Basket();
+    Widget home = Builder(builder: (context) {
+      return BottomNavigationScaffold(
+        items: <BottomNavigationItem>[
+          BottomNavigationItem(
+              icon: Icon(Icons.archive), title: "收集箱", page: basket),
+          BottomNavigationItem(
+              icon: Icon(Icons.directions_run), title: "行动", page: Text("行动")),
+          BottomNavigationItem(
+              icon: Icon(Icons.calendar_today), title: "日历", page: Text("日历")),
+          BottomNavigationItem(
+              icon: Icon(Icons.format_list_bulleted),
+              title: "清单",
+              page: Text("清单")),
+        ],
+        floatingActionButton: FloatingActionButton(onPressed: () {
+          TextEditingController controller = TextEditingController();
+          FocusNode focusNode = FocusNode();
+          return showDialog(context: context, builder: (context) {
+            return buildCardEditingDialog(context, controller, focusNode);
+          }).then((card) {
+            if(card != null) {
+              GTDCard.addCard(card);
+              GTDCard.saveCards();
+              setState(() {});
+            }
+          });
+        }, child: Icon(Icons.add)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      );
+    });
 
     return MaterialApp(
       title: 'Getting Things Done',

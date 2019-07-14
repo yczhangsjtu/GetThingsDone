@@ -42,10 +42,10 @@ class GTDCard {
     return true;
   }
 
-  static bool removeBasketCard(int index) {
+  static int findBasketCard(int index) {
     int count = -1;
     if(index < 0) {
-      return false;
+      return null;
     }
     int i = 0;
     for(; i < cards.length; i++) {
@@ -57,7 +57,24 @@ class GTDCard {
       }
     }
     if(count == index) {
+      return i;
+    }
+    return null;
+  }
+
+  static bool removeBasketCard(int index) {
+    int i = findBasketCard(index);
+    if(i != null) {
       _cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
+  static bool updateBasketCard(int index, GTDCard card) {
+    int i = findBasketCard(index);
+    if(i != null) {
+      _cards[index] = card;
       return true;
     }
     return false;
@@ -91,9 +108,7 @@ class GTDCard {
   static Future loadCards() async {
     try {
       final file = await _localFile;
-      print(file);
       var s = await file.readAsString();
-      print(s);
       loadCardsFromString(s);
     } catch (e) {
       loadCardsFromString("");
