@@ -114,11 +114,11 @@ class _CalendarState extends State<Calendar> {
           }
         }
         int start2;
-        for (int i = 0; i < _card1.timeOptions.length; i++) {
+        for (int i = 0; i < _card2.timeOptions.length; i++) {
           if (!_card2.timeOptions[i].match(day)) {
             continue;
           }
-          if (_card1.timeOptions[i].start != null &&
+          if (_card2.timeOptions[i].start != null &&
               (start2 == null || _card2.timeOptions[i].start < start2)) {
             start2 = _card2.timeOptions[i].start;
           }
