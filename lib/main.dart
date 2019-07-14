@@ -4,6 +4,7 @@ import 'core/card.dart';
 import 'pages/basket.dart';
 import 'pages/actions.dart';
 import 'pages/calendar.dart';
+import 'pages/inventories.dart';
 import 'pages/card.dart';
 
 void main() {
@@ -19,7 +20,6 @@ class GTDApp extends StatefulWidget {
   State<StatefulWidget> createState() {
     return GTDAppState();
   }
-
 }
 
 class GTDAppState extends State<GTDApp> {
@@ -37,21 +37,26 @@ class GTDAppState extends State<GTDApp> {
           BottomNavigationItem(
               icon: Icon(Icons.format_list_bulleted),
               title: "清单",
-              page: Text("清单")),
+              page: Inventories()),
         ],
-        floatingActionButton: FloatingActionButton(onPressed: () {
-          TextEditingController controller = TextEditingController();
-          FocusNode focusNode = FocusNode();
-          return showDialog(context: context, builder: (context) {
-            return buildCardEditingDialog(context, controller, focusNode);
-          }).then((card) {
-            if(card != null) {
-              GTDCard.addCard(card);
-              GTDCard.saveCards();
-              setState(() {});
-            }
-          });
-        }, child: Icon(Icons.add)),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              TextEditingController controller = TextEditingController();
+              FocusNode focusNode = FocusNode();
+              return showDialog(
+                  context: context,
+                  builder: (context) {
+                    return buildCardEditingDialog(
+                        context, controller, focusNode);
+                  }).then((card) {
+                if (card != null) {
+                  GTDCard.addCard(card);
+                  GTDCard.saveCards();
+                  setState(() {});
+                }
+              });
+            },
+            child: Icon(Icons.add)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       );
     });

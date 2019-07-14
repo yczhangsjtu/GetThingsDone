@@ -74,7 +74,7 @@ class GTDCard {
   static bool removeBasketCard(int index) {
     int i = findBasketCard(index);
     if (i != null) {
-      _cards.removeAt(i);
+      cards.removeAt(i);
       return true;
     }
     return false;
@@ -83,7 +83,7 @@ class GTDCard {
   static bool updateBasketCard(int index, GTDCard card) {
     int i = findBasketCard(index);
     if (i != null) {
-      _cards[i] = card;
+      cards[i] = card;
       return true;
     }
     return false;
@@ -102,7 +102,7 @@ class GTDCard {
   static bool removeArrangedActionCard(int index) {
     int i = findArrangedActionCard(index);
     if (i != null) {
-      _cards.removeAt(i);
+      cards.removeAt(i);
       return true;
     }
     return false;
@@ -111,7 +111,7 @@ class GTDCard {
   static bool updateArrangedActionCard(int index, GTDCard card) {
     int i = findArrangedActionCard(index);
     if (i != null) {
-      _cards[i] = card;
+      cards[i] = card;
       return true;
     }
     return false;
@@ -126,7 +126,7 @@ class GTDCard {
   static bool removeWaitingActionCard(int index) {
     int i = findWaitingActionCard(index);
     if (i != null) {
-      _cards.removeAt(i);
+      cards.removeAt(i);
       return true;
     }
     return false;
@@ -135,7 +135,7 @@ class GTDCard {
   static bool updateWaitingActionCard(int index, GTDCard card) {
     int i = findWaitingActionCard(index);
     if (i != null) {
-      _cards[i] = card;
+      cards[i] = card;
       return true;
     }
     return false;
@@ -150,7 +150,7 @@ class GTDCard {
   static bool removeExpiredActionCard(int index) {
     int i = findExpiredActionCard(index);
     if (i != null) {
-      _cards.removeAt(i);
+      cards.removeAt(i);
       return true;
     }
     return false;
@@ -159,7 +159,31 @@ class GTDCard {
   static bool updateExpiredActionCard(int index, GTDCard card) {
     int i = findExpiredActionCard(index);
     if (i != null) {
-      _cards[i] = card;
+      cards[i] = card;
+      return true;
+    }
+    return false;
+  }
+
+  static int findInventoryCard(int index, Inventory inventory) {
+    return findCard(index, (card) {
+      return card is InventoryCard && inventory.filterRule.match(card.title);
+    });
+  }
+
+  static bool removeInventoryCard(int index, Inventory inventory) {
+    int i = findInventoryCard(index, inventory);
+    if(i != null) {
+      cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
+  static bool updateInventoryCard(int index, Inventory inventory, GTDCard card) {
+    int i = findInventoryCard(index, inventory);
+    if (i != null) {
+      cards[i] = card;
       return true;
     }
     return false;
