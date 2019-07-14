@@ -30,7 +30,7 @@ class _InventoriesState extends State<Inventories> {
       Inventory inventory = Inventory.inventories[currentIndex];
       cards = GTDCard.cards.where((card) {
         return card is InventoryCard && inventory.filterRule.match(card.title);
-      });
+      }).toList();
     }
 
     Widget leftPanel = ListView.builder(
@@ -82,7 +82,9 @@ class _InventoriesState extends State<Inventories> {
     if (index == Inventory.inventories.length) {
       return IconButton(
         icon: Icon(Icons.add_circle_outline),
-        onPressed: () {},
+        onPressed: () {
+          _showAddInventoryDialog(context);
+        },
       );
     }
     return Container();
@@ -105,5 +107,58 @@ class _InventoriesState extends State<Inventories> {
         GTDCard.saveCards();
       }
     });
+  }
+
+  void _showAddInventoryDialog(BuildContext context) {
+    _controller.text = "";
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _buildEditDialog(context, _controller, _focusNode);
+        });
+  }
+
+  Widget _buildEditDialog(BuildContext context,
+      TextEditingController controller, FocusNode focusNode) {
+    return SimpleDialog(
+      backgroundColor: kEditCardDialogColor,
+      children: <Widget>[
+        EditableText(
+          backgroundCursorColor: Colors.black,
+          cursorColor: Colors.black,
+          controller: controller,
+          focusNode: focusNode,
+          style: kEditCardDialogStyle,
+          maxLines: null,
+        ),
+        ButtonBar(
+          children: <Widget>[
+            FlatButton(
+              child: Text("确定", style: kFlatButtonStyle),
+              onPressed: () {
+                if (controller.text.isEmpty) {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Text("清单名不能为空", style: kBottomSheetStyle);
+                      });
+                } else {
+                  Inventory.addInventory(controller.text);
+                  Inventory.saveInventories();
+                  Navigator.of(context).pop();
+                  setState(() {});
+                }
+              },
+            ),
+            FlatButton(
+              child: Text("取消", style: kFlatButtonStyle),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      ],
+    );
   }
 }

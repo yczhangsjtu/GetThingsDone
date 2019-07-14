@@ -581,7 +581,7 @@ class Inventory {
     if(filterRule == null) {
       return null;
     }
-    String name = CardUtils.decodeBase64String(s);
+    String name = CardUtils.decodeBase64String(s.substring(0, split));
     if(name == null) {
       return null;
     }
@@ -622,6 +622,9 @@ class Inventory {
   }
 
   static bool addInventoryAndApply(Inventory inventory) {
+    if(inventory == null) {
+      return false;
+    }
     if(!addInventory(inventory.name)) {
       return false;
     }
