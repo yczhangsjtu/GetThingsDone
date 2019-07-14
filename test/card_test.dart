@@ -160,14 +160,16 @@ void main() {
         true);
 
     // Test Inventories
-    Inventory.inventories = <Inventory>[
+    GTDCard.resetCards();
+    Inventory.resetInventories();
+    Inventory.addInventoryAndApply(
       Inventory(
           "书单",
           FilterRule(
               beginWithOptions: ["看书《", "《"],
               endWithOptions: ["》"],
               relationIsOr: false)),
-    ];
+    );
     expect(Inventory.addInventory(""), false);
     expect(Inventory.inventories.length, 1);
     expect(Inventory.addInventory("购物"), true);
@@ -196,14 +198,15 @@ void main() {
 
   test("Test inventory update", () {
     GTDCard.resetCards();
-    Inventory.inventories = <Inventory>[
+    Inventory.resetInventories();
+    Inventory.addInventoryAndApply(
       Inventory(
           "书单",
           FilterRule(
               beginWithOptions: ["看书《", "《"],
               endWithOptions: ["》"],
               relationIsOr: false)),
-    ];
+    );
     expect(Inventory.addInventory("购物"), true);
     expect(Inventory.addInventory("游泳"), true);
     expect(GTDCard.addCard(GTDCard.fromString("洗衣服\n周日")), true);
@@ -231,14 +234,16 @@ void main() {
   });
 
   test("Test card serialization and deserialization", () {
-    Inventory.inventories = <Inventory>[
+    GTDCard.resetCards();
+    Inventory.resetInventories();
+    Inventory.addInventoryAndApply(
       Inventory(
           "书单",
           FilterRule(
               beginWithOptions: ["看书《", "《"],
               endWithOptions: ["》"],
               relationIsOr: false)),
-    ];
+    );
     expect(Inventory.addInventory("购物"), true);
     expect(Inventory.addInventory("游泳"), true);
     int index = Inventory.findInventory("购物");
@@ -276,7 +281,7 @@ void main() {
 
   test("Test load and save", () async {
     GTDCard.resetCards();
-    Inventory.inventories = null;
+    Inventory.resetInventories();
     expect(GTDCard.addCard(GTDCard.fromString("洗衣服\n周日")), true);
     expect(GTDCard.addCard(ActionCard.fromString("洗澡\n周日下午6点\n重要")), true);
     expect(GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n7月11日 下午5点")), true);

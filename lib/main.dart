@@ -7,9 +7,10 @@ import 'pages/calendar.dart';
 import 'pages/card.dart';
 
 void main() {
-  GTDCard.loadCards().then((e) {
-    runApp(GTDApp());
-  }).then((e) {
+  Inventory.loadInventories().then((v) {
+    GTDCard.loadCards().then((e) {
+      runApp(GTDApp());
+    });
   });
 }
 

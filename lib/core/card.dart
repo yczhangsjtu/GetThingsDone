@@ -9,10 +9,12 @@ import 'date_time_utils.dart';
 class GTDCard {
   final String title;
   final List<String> comments;
+
   static List<GTDCard> get cards {
     _cards = _cards ?? [];
     return _cards;
   }
+
   static List<GTDCard> _cards;
 
   GTDCard(this.title, {this.comments});
@@ -45,19 +47,19 @@ class GTDCard {
 
   static int findCard(int index, bool Function(GTDCard) tester) {
     int count = -1;
-    if(index < 0) {
+    if (index < 0) {
       return null;
     }
     int i = 0;
-    for(; i < cards.length; i++) {
-      if(tester(cards[i])) {
+    for (; i < cards.length; i++) {
+      if (tester(cards[i])) {
         count++;
-        if(count == index) {
+        if (count == index) {
           break;
         }
       }
     }
-    if(count == index) {
+    if (count == index) {
       return i;
     }
     return null;
@@ -71,7 +73,7 @@ class GTDCard {
 
   static bool removeBasketCard(int index) {
     int i = findBasketCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards.removeAt(i);
       return true;
     }
@@ -80,7 +82,7 @@ class GTDCard {
 
   static bool updateBasketCard(int index, GTDCard card) {
     int i = findBasketCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards[i] = card;
       return true;
     }
@@ -99,7 +101,7 @@ class GTDCard {
 
   static bool removeArrangedActionCard(int index) {
     int i = findArrangedActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards.removeAt(i);
       return true;
     }
@@ -108,7 +110,7 @@ class GTDCard {
 
   static bool updateArrangedActionCard(int index, GTDCard card) {
     int i = findArrangedActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards[i] = card;
       return true;
     }
@@ -123,7 +125,7 @@ class GTDCard {
 
   static bool removeWaitingActionCard(int index) {
     int i = findWaitingActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards.removeAt(i);
       return true;
     }
@@ -132,7 +134,7 @@ class GTDCard {
 
   static bool updateWaitingActionCard(int index, GTDCard card) {
     int i = findWaitingActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards[i] = card;
       return true;
     }
@@ -147,7 +149,7 @@ class GTDCard {
 
   static bool removeExpiredActionCard(int index) {
     int i = findExpiredActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards.removeAt(i);
       return true;
     }
@@ -156,7 +158,7 @@ class GTDCard {
 
   static bool updateExpiredActionCard(int index, GTDCard card) {
     int i = findExpiredActionCard(index);
-    if(i != null) {
+    if (i != null) {
       _cards[i] = card;
       return true;
     }
@@ -174,7 +176,7 @@ class GTDCard {
 
   static void loadCardsFromString(String s) {
     cards.clear();
-    if(CardUtils.stringIsNullOrEmpty(s)) {
+    if (CardUtils.stringIsNullOrEmpty(s)) {
       return;
     }
     var lines = s.split("\n");
@@ -329,22 +331,23 @@ class ActionCard extends GTDCard {
 
   bool expired() {
     return timeOptions?.any((timeOption) {
-      if (timeOption is Period) {
-        return false;
-      }
-      FixedTime fixedTime = timeOption as FixedTime;
-      if (fixedTime.day < DateTimeUtils.today()) {
-        return true;
-      }
-      if (fixedTime.day > DateTimeUtils.today()) {
-        return false;
-      }
-      if (fixedTime.start == null) {
-        return false;
-      }
-      return fixedTime.start + (fixedTime.length ?? 0) <=
-          DateTimeUtils.now();
-    } ?? false);
+          if (timeOption is Period) {
+            return false;
+          }
+          FixedTime fixedTime = timeOption as FixedTime;
+          if (fixedTime.day < DateTimeUtils.today()) {
+            return true;
+          }
+          if (fixedTime.day > DateTimeUtils.today()) {
+            return false;
+          }
+          if (fixedTime.start == null) {
+            return false;
+          }
+          return fixedTime.start + (fixedTime.length ?? 0) <=
+              DateTimeUtils.now();
+        } ??
+        false);
   }
 
   static ActionCard fromString(String s) {
@@ -539,13 +542,38 @@ class Inventory {
       : assert(!CardUtils.stringIsNullOrEmpty(name)),
         assert(filterRule != null);
 
-  static List<Inventory> inventories;
+  String serialize() {
+    return CardUtils.encodeBase64String(name) +
+        ";" +
+        this.filterRule.serialize();
+  }
+
+  static Inventory deserialize(String s) {
+    int split = s.indexOf(";");
+    if(split == -1) {
+      return null;
+    }
+    FilterRule filterRule = FilterRule.deserialize(s.substring(split+1));
+    if(filterRule == null) {
+      return null;
+    }
+    String name = CardUtils.decodeBase64String(s);
+    if(name == null) {
+      return null;
+    }
+    return Inventory(name, filterRule);
+  }
+
+  static List<Inventory> get inventories {
+    _inventories = _inventories ?? [];
+    return _inventories;
+  }
+  static List<Inventory> _inventories;
 
   static int firstMatchingInventory(String s) {
     if (CardUtils.stringIsNullOrEmpty(s)) {
       return null;
     }
-    inventories = inventories ?? <Inventory>[];
     for (int i = 0; i < inventories.length; i++) {
       if (inventories[i].filterRule.match(s)) {
         return i;
@@ -558,7 +586,6 @@ class Inventory {
     if (CardUtils.stringIsNullOrEmpty(name)) {
       return false;
     }
-    inventories = inventories ?? <Inventory>[];
     for (int i = 0; i < inventories.length; i++) {
       if (inventories[i].name == name) {
         return false;
@@ -570,8 +597,17 @@ class Inventory {
     return true;
   }
 
+  static bool addInventoryAndApply(Inventory inventory) {
+    if(!addInventory(inventory.name)) {
+      return false;
+    }
+    if(!updateInventoryFilter(inventories.length - 1, inventory.filterRule)) {
+      return false;
+    }
+    return true;
+  }
+
   static bool updateInventoryFilter(int index, FilterRule filterRule) {
-    inventories = inventories ?? <Inventory>[];
     if (index < 0 || index >= inventories.length) {
       return false;
     }
@@ -595,7 +631,6 @@ class Inventory {
   }
 
   static int findInventory(String name) {
-    inventories = inventories ?? <Inventory>[];
     if (CardUtils.stringIsNullOrEmpty(name)) {
       return null;
     }
@@ -605,5 +640,55 @@ class Inventory {
       }
     }
     return null;
+  }
+
+  static String allInventoriesToString() {
+    return inventories
+        .map((inventory) {
+          return inventory.serialize();
+        })
+        .toList()
+        .join("\n");
+  }
+
+  static void loadInventoriesFromString(String s) {
+    inventories.clear();
+    if (CardUtils.stringIsNullOrEmpty(s)) {
+      return;
+    }
+    var lines = s.split("\n");
+    for (int i = 0; i < lines.length; i++) {
+      var inventory = Inventory.deserialize(lines[i]);
+      addInventoryAndApply(inventory);
+    }
+  }
+
+  static void resetInventories() {
+    inventories.clear();
+  }
+
+  static Future loadInventories() async {
+    try {
+      final file = await _localFile;
+      var s = await file.readAsString();
+      loadInventoriesFromString(s);
+    } catch (e) {
+      loadInventoriesFromString("");
+    }
+  }
+
+  static saveInventories() async {
+    final file = await _localFile;
+    await file.writeAsString(allInventoriesToString());
+  }
+
+  static Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/inventories');
+  }
+
+  static Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 }
