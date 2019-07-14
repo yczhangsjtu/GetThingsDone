@@ -35,6 +35,11 @@ class DateTimeUtils {
     return _gregorianToJulian(today.year, today.month, today.day);
   }
 
+  static int now() {
+    var now = DateTime.now();
+    return now.hour * 60 + now.minute;
+  }
+
   static String durationToString(int minutes) {
     if (minutes == 0) {
       return "0m";

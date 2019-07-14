@@ -38,9 +38,10 @@ class _BasketState extends State<Basket> {
   Widget _buildCard(BuildContext context, int index) {
     return buildCard(context, cards[index], _controller, _focusNode, (card) {
       if (card != null) {
-        GTDCard.updateBasketCard(index, card);
-        setState(() {});
-        GTDCard.saveCards();
+        if(GTDCard.updateBasketCard(index, card)) {
+          setState(() {});
+          GTDCard.saveCards();
+        }
       }
     }, () {
       if (GTDCard.removeBasketCard(index)) {

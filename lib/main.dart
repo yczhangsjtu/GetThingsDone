@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'components/bottom_navigation_scaffold.dart';
 import 'pages/basket.dart';
+import 'pages/actions.dart';
 import 'core/card.dart';
 import 'pages/card.dart';
 
@@ -8,13 +9,6 @@ void main() {
   GTDCard.loadCards().then((e) {
     runApp(GTDApp());
   }).then((e) {
-    GTDCard.addCard(GTDCard.fromString("看书《白鹿原》\n等待买来《白鹿原》"));
-    GTDCard.addCard(GTDCard.fromString("买书《白鹿原》"));
-    GTDCard.addCard(GTDCard.fromString("洗衣服"));
-    GTDCard.addCard(GTDCard.fromString("洗澡\n今天下午7点\n重要"));
-    GTDCard.addCard(GTDCard.fromString("买书《穷查理宝典》\n明天上午8点\n去新华书店"));
-    GTDCard.addCard(GTDCard.fromString("买书《苏菲的世界》\n下午5点\n去图书大厦\n很重要"));
-    GTDCard.addCard(GTDCard.fromString("去参加会议\n逸夫楼200号\n下午3点30"));
   });
 }
 
@@ -29,14 +23,13 @@ class GTDApp extends StatefulWidget {
 class GTDAppState extends State<GTDApp> {
   @override
   Widget build(BuildContext context) {
-    Basket basket = Basket();
     Widget home = Builder(builder: (context) {
       return BottomNavigationScaffold(
         items: <BottomNavigationItem>[
           BottomNavigationItem(
-              icon: Icon(Icons.archive), title: "收集箱", page: basket),
+              icon: Icon(Icons.archive), title: "收集箱", page: Basket()),
           BottomNavigationItem(
-              icon: Icon(Icons.directions_run), title: "行动", page: Text("行动")),
+              icon: Icon(Icons.directions_run), title: "行动", page: Actions()),
           BottomNavigationItem(
               icon: Icon(Icons.calendar_today), title: "日历", page: Text("日历")),
           BottomNavigationItem(

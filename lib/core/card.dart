@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
 
-import 'dart:convert';
 import 'time.dart';
+import 'date_time_utils.dart';
 
 class GTDCard {
   final String title;
@@ -42,14 +43,14 @@ class GTDCard {
     return true;
   }
 
-  static int findBasketCard(int index) {
+  static int findCard(int index, bool Function(GTDCard) tester) {
     int count = -1;
     if(index < 0) {
       return null;
     }
     int i = 0;
     for(; i < cards.length; i++) {
-      if(cards[i] is BasketCard) {
+      if(tester(cards[i])) {
         count++;
         if(count == index) {
           break;
@@ -60,6 +61,12 @@ class GTDCard {
       return i;
     }
     return null;
+  }
+
+  static int findBasketCard(int index) {
+    return findCard(index, (card) {
+      return card is BasketCard;
+    });
   }
 
   static bool removeBasketCard(int index) {
@@ -74,7 +81,83 @@ class GTDCard {
   static bool updateBasketCard(int index, GTDCard card) {
     int i = findBasketCard(index);
     if(i != null) {
-      _cards[index] = card;
+      _cards[i] = card;
+      return true;
+    }
+    return false;
+  }
+
+  static bool isArrangedActionCard(GTDCard card) {
+    return card is ActionCard && card.waiting == null && !card.expired();
+  }
+
+  static int findArrangedActionCard(int index) {
+    return findCard(index, (card) {
+      return isArrangedActionCard(card);
+    });
+  }
+
+  static bool removeArrangedActionCard(int index) {
+    int i = findArrangedActionCard(index);
+    if(i != null) {
+      _cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
+  static bool updateArrangedActionCard(int index, GTDCard card) {
+    int i = findArrangedActionCard(index);
+    if(i != null) {
+      _cards[i] = card;
+      return true;
+    }
+    return false;
+  }
+
+  static int findWaitingActionCard(int index) {
+    return findCard(index, (card) {
+      return card is ActionCard && card.waiting != null;
+    });
+  }
+
+  static bool removeWaitingActionCard(int index) {
+    int i = findWaitingActionCard(index);
+    if(i != null) {
+      _cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
+  static bool updateWaitingActionCard(int index, GTDCard card) {
+    int i = findWaitingActionCard(index);
+    if(i != null) {
+      _cards[i] = card;
+      return true;
+    }
+    return false;
+  }
+
+  static int findExpiredActionCard(int index) {
+    return findCard(index, (card) {
+      return card is ActionCard && card.expired();
+    });
+  }
+
+  static bool removeExpiredActionCard(int index) {
+    int i = findExpiredActionCard(index);
+    if(i != null) {
+      _cards.removeAt(i);
+      return true;
+    }
+    return false;
+  }
+
+  static bool updateExpiredActionCard(int index, GTDCard card) {
+    int i = findExpiredActionCard(index);
+    if(i != null) {
+      _cards[i] = card;
       return true;
     }
     return false;
@@ -242,6 +325,26 @@ class ActionCard extends GTDCard {
   @override
   String serialize() {
     return CardUtils.encodeBase64String(toString());
+  }
+
+  bool expired() {
+    return timeOptions?.any((timeOption) {
+      if (timeOption is Period) {
+        return false;
+      }
+      FixedTime fixedTime = timeOption as FixedTime;
+      if (fixedTime.day < DateTimeUtils.today()) {
+        return true;
+      }
+      if (fixedTime.day > DateTimeUtils.today()) {
+        return false;
+      }
+      if (fixedTime.start == null) {
+        return false;
+      }
+      return fixedTime.start + (fixedTime.length ?? 0) <=
+          DateTimeUtils.now();
+    } ?? false);
   }
 
   static ActionCard fromString(String s) {

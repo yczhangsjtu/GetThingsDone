@@ -18,9 +18,40 @@ Widget buildCard(
           children: card.comments.map((s) {
             return Text(s, style: kCommentStyle);
           }).toList());
+  Widget timeOptions =
+      (card is ActionCard && (card.timeOptions?.isNotEmpty ?? false))
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: card.timeOptions.map((timeOption) {
+                return Text(timeOption.toString(), style: kTimeOptionStyle);
+              }).toList())
+          : Container();
+  Widget waiting = (card is ActionCard && card.waiting != null)
+      ? Text(card.waiting, style: kWaitingStyle)
+      : Container();
+  Widget nextAct = (card is ActionCard && card.nextAct != null)
+      ? Text(card.nextAct, style: kNextActionStyle)
+      : Container();
+
+  Widget subtitle = Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      timeOptions,
+      waiting,
+      nextAct,
+      comments,
+    ],
+  );
+
+  Color cardColor = card is BasketCard
+      ? kBasketCardColor
+      : (card is ActionCard
+          ? importanceToColor(card.importance)
+          : kInventoryCardColor);
+
   Widget child = ListTile(
     title: Text(card.title, style: kCardTitleStyle),
-    subtitle: comments,
+    subtitle: subtitle,
     trailing: Container(
         width: 80,
         child: Row(
@@ -52,7 +83,7 @@ Widget buildCard(
       padding: EdgeInsets.only(left: 20, right: 5, top: 5, bottom: 10),
       child: child);
   return Card(
-    color: kBasketCardColor,
+    color: cardColor,
     elevation: 4.0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -101,4 +132,19 @@ Widget buildCardEditingDialog(BuildContext context,
       ),
     ],
   );
+}
+
+Widget buildTabButton(String name, bool active) {
+  return Container(
+      width: 80,
+      height: 48,
+      child: Text(name, style: active ? kActiveTabStyle : kInactiveTabStyle),
+      decoration: active
+          ? BoxDecoration(
+              color: kActiveTabColor,
+            )
+          : BoxDecoration(
+              color: kInactiveTabColor,
+              border: Border.all(color: Colors.white),
+            ));
 }
