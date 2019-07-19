@@ -634,6 +634,14 @@ class Inventory {
     return true;
   }
 
+  static bool removeInventory(int index) {
+    if(!updateInventoryFilter(index, FilterRule())) {
+      return false;
+    }
+    inventories.removeAt(index);
+    return true;
+  }
+
   static bool updateInventoryFilter(int index, FilterRule filterRule) {
     if (index < 0 || index >= inventories.length) {
       return false;

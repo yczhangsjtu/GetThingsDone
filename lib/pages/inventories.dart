@@ -15,7 +15,10 @@ class _InventoriesState extends State<Inventories> {
   int currentIndex = 0;
   List<GTDCard> cards = [];
   TextEditingController _controller = TextEditingController();
+  TextEditingController _beginController = TextEditingController();
+  TextEditingController _endController = TextEditingController();
   FocusNode _focusNode = FocusNode();
+  bool _currentIsOr;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +52,17 @@ class _InventoriesState extends State<Inventories> {
     cardList = Container(
       color: kActiveTabColor,
       child: cardList,
+    );
+
+    cardList = Column(
+      children: <Widget>[
+        Inventory.inventories.isNotEmpty
+            ? _buildControlPanel(context, currentIndex)
+            : Container(),
+        Expanded(
+          child: cardList,
+        )
+      ],
     );
 
     Widget body = Row(
@@ -114,13 +128,14 @@ class _InventoriesState extends State<Inventories> {
     showDialog(
         context: context,
         builder: (context) {
-          return _buildEditDialog(context, _controller, _focusNode);
+          return _buildAddInventoryDialog(context, _controller, _focusNode);
         });
   }
 
-  Widget _buildEditDialog(BuildContext context,
+  Widget _buildAddInventoryDialog(BuildContext context,
       TextEditingController controller, FocusNode focusNode) {
     return SimpleDialog(
+      contentPadding: EdgeInsets.all(10),
       backgroundColor: kEditCardDialogColor,
       children: <Widget>[
         EditableText(
@@ -160,5 +175,179 @@ class _InventoriesState extends State<Inventories> {
         ),
       ],
     );
+  }
+
+  Widget _buildControlPanel(BuildContext context, int index) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              _showEditInventoryDialog(context, index);
+            }),
+        IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              Inventory.removeInventory(currentIndex);
+              Inventory.saveInventories();
+              setState(() {});
+            }),
+      ],
+    );
+  }
+
+  void _showEditInventoryDialog(BuildContext context, int index) {
+    _controller.text = "";
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _buildEditInventoryDialog(
+              context, index, _beginController, _endController);
+        });
+  }
+
+  Widget _buildEditInventoryDialog(
+      BuildContext context,
+      int index,
+      TextEditingController _beginController,
+      TextEditingController _endController) {
+    _currentIsOr = Inventory.inventories[index].filterRule.relationIsOr;
+    _beginController.text =
+        Inventory.inventories[index].filterRule.beginWithOptions?.join("\n") ??
+            "";
+    _endController.text =
+        Inventory.inventories[index].filterRule.endWithOptions?.join("\n") ??
+            "";
+    return SimpleDialog(
+      contentPadding: EdgeInsets.all(10),
+      backgroundColor: kEditCardDialogColor,
+      children: <Widget>[
+        TextField(
+          cursorColor: Colors.black,
+          controller: _beginController,
+          style: kEditCardDialogStyle,
+          maxLines: null,
+          decoration: InputDecoration(
+            labelText: "开头",
+          ),
+        ),
+        TextField(
+          cursorColor: Colors.black,
+          controller: _endController,
+          style: kEditCardDialogStyle,
+          maxLines: null,
+          decoration: InputDecoration(
+            labelText: "结尾",
+          ),
+        ),
+        BinarySelector(
+            trueChild: Text("或"),
+            falseChild: Text("且"),
+            initialValue: _currentIsOr,
+            onChanged: (value) {
+              _currentIsOr = value;
+            }),
+        ButtonBar(
+          children: <Widget>[
+            FlatButton(
+              child: Text("确定", style: kFlatButtonStyle),
+              onPressed: () {
+                Inventory.updateInventoryFilter(
+                    index,
+                    FilterRule(
+                      beginWithOptions:
+                          _beginController.text.split("\n").where((s) {
+                        return s.isNotEmpty;
+                      }).toList(),
+                      endWithOptions:
+                          _endController.text.split("\n").where((s) {
+                        return s.isNotEmpty;
+                      }).toList(),
+                      relationIsOr: _currentIsOr,
+                    ));
+                Inventory.saveInventories();
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+            ),
+            FlatButton(
+              child: Text("取消", style: kFlatButtonStyle),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class BinarySelector extends StatefulWidget {
+  final Widget trueChild;
+  final Widget falseChild;
+  final bool horizontal;
+  final bool initialValue;
+  final ValueChanged<bool> onChanged;
+
+  BinarySelector(
+      {this.trueChild,
+      this.falseChild,
+      this.onChanged,
+      this.horizontal = true,
+      this.initialValue = true})
+      : assert(horizontal != null),
+        assert(initialValue != null);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _BinarySelectorState();
+  }
+}
+
+class _BinarySelectorState extends State<BinarySelector> {
+  bool _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget first = Radio<bool>(
+        groupValue: _value,
+        value: true,
+        onChanged: (value) {
+          setState(() {
+            _value = value;
+            if (widget.onChanged != null) widget.onChanged(value);
+          });
+        });
+    first = Row(
+      children: <Widget>[
+        first,
+        widget.trueChild,
+      ],
+    );
+    Widget second = Radio<bool>(
+        groupValue: _value,
+        value: false,
+        onChanged: (value) {
+          setState(() {
+            _value = value;
+            if (widget.onChanged != null) widget.onChanged(value);
+          });
+        });
+    second = Row(
+      children: <Widget>[
+        second,
+        widget.falseChild,
+      ],
+    );
+    var list = [first, second];
+    return widget.horizontal ? Row(children: list) : Column(children: list);
   }
 }

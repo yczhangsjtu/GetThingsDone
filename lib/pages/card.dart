@@ -109,6 +109,7 @@ Widget buildCard(BuildContext context, GTDCard card,
 Widget buildCardEditingDialog(BuildContext context,
     TextEditingController controller, FocusNode focusNode) {
   return SimpleDialog(
+    contentPadding: EdgeInsets.all(10),
     backgroundColor: kEditCardDialogColor,
     children: <Widget>[
       EditableText(
