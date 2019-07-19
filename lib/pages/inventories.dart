@@ -56,12 +56,12 @@ class _InventoriesState extends State<Inventories> {
 
     cardList = Column(
       children: <Widget>[
+        Expanded(
+          child: cardList,
+        ),
         Inventory.inventories.isNotEmpty
             ? _buildControlPanel(context, currentIndex)
             : Container(),
-        Expanded(
-          child: cardList,
-        )
       ],
     );
 
@@ -179,7 +179,7 @@ class _InventoriesState extends State<Inventories> {
 
   Widget _buildControlPanel(BuildContext context, int index) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         IconButton(
             icon: Icon(Icons.edit),
