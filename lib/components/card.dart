@@ -110,13 +110,45 @@ Widget buildCard(BuildContext context, GTDCard card,
   );
 }
 
+class _ActionCardCompleteCheckbox extends StatefulWidget {
+  final ActionCard card;
+  final VoidCallback onBadgeChanged;
+
+  _ActionCardCompleteCheckbox(this.card, this.onBadgeChanged);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ActionCardCompleteCheckboxState();
+  }
+}
+
+class _ActionCardCompleteCheckboxState
+    extends State<_ActionCardCompleteCheckbox> {
+  @override
+  Widget build(BuildContext context) {
+    return Checkbox(
+      value: widget.card.getCompleted(DateTimeUtils.today()),
+      onChanged: (value) {
+        widget.card.setCompleted(value, DateTimeUtils.today());
+        ActionCard.saveCompleted();
+        setState(() {});
+        if(widget.onBadgeChanged != null) {
+          widget.onBadgeChanged();
+        }
+      },
+    );
+  }
+}
+
 Widget buildCalendarCard(BuildContext context, GTDCard card,
     {TextEditingController controller,
     FocusNode focusNode,
     int restrictedToDay,
     bool showComments,
     bool showWaiting,
-    bool showNextAct}) {
+    bool showNextAct,
+    bool showCheckbox,
+    VoidCallback onBadgeChanged}) {
   Widget comments = card.comments.isEmpty || (showComments != true)
       ? Container()
       : Column(
@@ -176,16 +208,23 @@ Widget buildCalendarCard(BuildContext context, GTDCard card,
       subtitle,
     ],
   );
+
+  if (showCheckbox == true) {
+    child = Row(
+      children: <Widget>[
+        Expanded(child: child),
+        _ActionCardCompleteCheckbox(card, onBadgeChanged),
+      ],
+    );
+  }
+
   child = Padding(
       padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
       child: child);
-  return Container(
-    decoration: ShapeDecoration(
-      color: cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topRight: Radius.circular(8.0)),
-      ),
-    ),
+
+  return Card(
+    margin: EdgeInsets.only(bottom: 1, top: 1),
+    color: cardColor,
     child: child,
   );
 }

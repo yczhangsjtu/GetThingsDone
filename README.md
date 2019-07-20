@@ -63,6 +63,9 @@ On the other hand, I don't think I am the suitable person to implement the logic
 | Version | Change |
 |:------- |:------ |
 | 1.0.0   | First working version. |
+| 1.0.1   | Add badge notification to bottom navigation bar. |
+|         | Change the calendar style. |
+|         | Add checkbox to today page. |
 
 ## TODO
 
@@ -72,8 +75,6 @@ On the other hand, I don't think I am the suitable person to implement the logic
 - 日历界面调整
   - 更完善的日期切换系统
   - 给今天界面加上时间线，标注固定时间的行动
-  - 给今天界面加上复选框，标记已经完成的行动
-  - 将固定时间和不固定时间的行动分开显示
 - 支持清单顺序的切换
 
 ### Known Issues

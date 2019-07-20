@@ -8,9 +8,11 @@ import 'pages/inventories.dart';
 import 'package:flutter_gtd/components/card.dart';
 
 void main() {
-  Inventory.loadInventories().then((v) {
-    GTDCard.loadCards().then((e) {
-      runApp(GTDApp());
+  Inventory.loadInventories().then((_) {
+    GTDCard.loadCards().then((_) {
+      ActionCard.loadCompleted().then((_) {
+        runApp(GTDApp());
+      });
     });
   });
 }
@@ -52,7 +54,7 @@ class GTDAppState extends State<GTDApp> {
               title: "行动",
               page: Actions(_onBadgeChanged)),
           BottomNavigationItem(
-              icon: Icon(Icons.calendar_today), title: "日历", page: Calendar()),
+              icon: Icon(Icons.calendar_today), title: "日历", page: Calendar(_onBadgeChanged)),
           BottomNavigationItem(
               icon: Icon(Icons.format_list_bulleted),
               title: "清单",
@@ -96,7 +98,7 @@ class GTDAppState extends State<GTDApp> {
     _badgeMap.updateBadge("收集箱", count > 0 ? "$count" : null);
     count = GTDCard.countExpiredActionCard();
     _badgeMap.updateBadge("行动", count > 0 ? "$count" : null);
-    count = GTDCard.countTodayCard();
+    count = GTDCard.countTodayUncompletedCard();
     _badgeMap.updateBadge("日历", count > 0 ? "$count" : null);
   }
 }

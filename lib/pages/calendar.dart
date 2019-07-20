@@ -6,6 +6,10 @@ import 'package:flutter_gtd/components/card.dart';
 import 'package:flutter_gtd/components/styles.dart';
 
 class Calendar extends StatefulWidget {
+  final VoidCallback onBadgeChanged;
+
+  Calendar(this.onBadgeChanged);
+
   @override
   State<StatefulWidget> createState() {
     return _CalendarState();
@@ -152,7 +156,9 @@ class _CalendarState extends State<Calendar> {
         restrictedToDay: currentIndex == 0 ? DateTimeUtils.today() : currentDay,
         showComments: currentIndex == 0,
         showWaiting: currentIndex == 0,
-        showNextAct: currentIndex == 0);
+        showNextAct: currentIndex == 0,
+        showCheckbox: currentIndex == 0,
+        onBadgeChanged: widget.onBadgeChanged);
   }
 
   Widget _buildDaySelector(BuildContext context) {

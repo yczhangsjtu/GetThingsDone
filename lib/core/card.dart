@@ -193,6 +193,15 @@ class GTDCard {
     });
   }
 
+  static int countTodayUncompletedCard() {
+    return countCard((card) {
+      return card is ActionCard &&
+          card.timeOptions.any((o) {
+            return o.match(DateTimeUtils.today());
+          }) && !card.getCompleted(DateTimeUtils.today());
+    });
+  }
+
   static int countExpiredActionCard() {
     return countCard(isExpiredCard);
   }
@@ -244,7 +253,7 @@ class GTDCard {
   }
 
   static void resetCards() {
-    _cards = _cards ?? [];
+    _cards = [];
   }
 
   static Future loadCards() async {
@@ -407,6 +416,28 @@ class ActionCard extends GTDCard {
         false);
   }
 
+  static Set<String> get completedCards {
+    _completedCards = _completedCards ?? Set();
+    return _completedCards;
+  }
+
+  static Set<String> _completedCards;
+
+  void setCompleted(bool value, int day) {
+    if (value) {
+      completedCards
+          .add("${CardUtils.encodeBase64String(this.title)}:$day");
+    } else {
+      completedCards
+          .remove("${CardUtils.encodeBase64String(this.title)}:$day");
+    }
+  }
+
+  bool getCompleted(int day) {
+    return completedCards
+        .contains("${CardUtils.encodeBase64String(this.title)}:$day");
+  }
+
   static ActionCard fromString(String s) {
     var lines = s.split("\n");
     String title;
@@ -455,6 +486,58 @@ class ActionCard extends GTDCard {
           comments: comments);
     }
     return null;
+  }
+
+  static String allCompletedToString() {
+    StringBuffer sb = StringBuffer();
+    String today = ":${DateTimeUtils.today()}";
+    for(var s in completedCards) {
+      if(s.endsWith(today)) {
+        sb.write("$s\n");
+      }
+    }
+    return sb.toString();
+  }
+
+  static void loadCompletedFromString(String s) {
+    String today = ":${DateTimeUtils.today()}";
+    s.split("\n").forEach((str) {
+      str = str.trim();
+      if(str.isEmpty) return;
+      if(str.endsWith(today)) {
+        completedCards.add(str);
+      }
+    });
+  }
+
+
+  static void resetCompleted() {
+    _completedCards = Set();
+  }
+
+  static Future loadCompleted() async {
+    try {
+      final file = await _localFile;
+      var s = await file.readAsString();
+      loadCompletedFromString(s);
+    } catch (e) {
+      loadCompletedFromString("");
+    }
+  }
+
+  static saveCompleted() async {
+    final file = await _localFile;
+    await file.writeAsString(allCompletedToString());
+  }
+
+  static Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/completed');
+  }
+
+  static Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 }
 
