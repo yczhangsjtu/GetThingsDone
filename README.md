@@ -68,7 +68,6 @@ On the other hand, I don't think I am the suitable person to implement the logic
 
 ### Features
 
-- 收集箱上增加红圈提示未分类卡片数量，行动图标上提示已过期卡片数量
 - 下一步行动换其他字体
 - 日历界面调整
   - 更完善的日期切换系统
