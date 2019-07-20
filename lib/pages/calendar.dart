@@ -57,8 +57,16 @@ class _CalendarState extends State<Calendar> {
       ],
     );
 
-    Widget cardList =
-        ListView.builder(itemBuilder: _buildCard, itemCount: cards.length);
+    Widget cardList = ListView.separated(
+      itemBuilder: _buildCard,
+      itemCount: cards.length,
+      separatorBuilder: (context, index) {
+        return Divider(
+          height: 3,
+          color: kActiveTabColor,
+        );
+      },
+    );
 
     if (currentIndex == 1) {
       cardList = Column(
@@ -72,6 +80,9 @@ class _CalendarState extends State<Calendar> {
         ],
       );
     }
+
+    cardList =
+        Padding(padding: EdgeInsets.all(5), child: cardList);
 
     cardList = Container(
       child: cardList,
@@ -124,10 +135,10 @@ class _CalendarState extends State<Calendar> {
           }
         }
         if (start1 == null && start2 != null) {
-          return -1;
+          return 1;
         }
         if (start1 != null && start2 == null) {
-          return 1;
+          return -1;
         }
         if (start1 != null && start2 != null && start1 != start2) {
           return start1 - start2;
@@ -138,9 +149,11 @@ class _CalendarState extends State<Calendar> {
 
   Widget _buildCard(BuildContext context, int index) {
     GTDCard card = cards[index];
-    return buildCard(context, card,
-        restrictedToDay:
-            currentIndex == 0 ? DateTimeUtils.today() : currentDay);
+    return buildCalendarCard(context, card,
+        restrictedToDay: currentIndex == 0 ? DateTimeUtils.today() : currentDay,
+        showComments: currentIndex == 0,
+        showWaiting: currentIndex == 0,
+        showNextAct: currentIndex == 0);
   }
 
   Widget _buildDaySelector(BuildContext context) {

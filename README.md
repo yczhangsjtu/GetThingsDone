@@ -71,7 +71,6 @@ On the other hand, I don't think I am the suitable person to implement the logic
 - 收集箱上增加红圈提示未分类卡片数量，行动图标上提示已过期卡片数量
 - 下一步行动换其他字体
 - 日历界面调整
-  - 将卡片风格改成其他风格，和能够编辑的卡片区分开
   - 更完善的日期切换系统
   - 给今天界面加上时间线，标注固定时间的行动
   - 给今天界面加上复选框，标记已经完成的行动
