@@ -81,8 +81,7 @@ class _CalendarState extends State<Calendar> {
       );
     }
 
-    cardList =
-        Padding(padding: EdgeInsets.all(5), child: cardList);
+    cardList = Padding(padding: EdgeInsets.all(5), child: cardList);
 
     cardList = Container(
       child: cardList,

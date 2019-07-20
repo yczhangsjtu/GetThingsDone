@@ -23,21 +23,40 @@ class GTDApp extends StatefulWidget {
 }
 
 class GTDAppState extends State<GTDApp> {
+  BadgeMap _badgeMap;
+
+  @override
+  void initState() {
+    super.initState();
+    _badgeMap = BadgeMap();
+    _onBadgeChanged();
+  }
+
+  @override
+  void dispose() {
+    _badgeMap.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget home = Builder(builder: (context) {
       return BottomNavigationScaffold(
         items: <BottomNavigationItem>[
           BottomNavigationItem(
-              icon: Icon(Icons.archive), title: "收集箱", page: Basket()),
+              icon: Icon(Icons.archive),
+              title: "收集箱",
+              page: Basket(_onBadgeChanged)),
           BottomNavigationItem(
-              icon: Icon(Icons.directions_run), title: "行动", page: Actions()),
+              icon: Icon(Icons.directions_run),
+              title: "行动",
+              page: Actions(_onBadgeChanged)),
           BottomNavigationItem(
               icon: Icon(Icons.calendar_today), title: "日历", page: Calendar()),
           BottomNavigationItem(
               icon: Icon(Icons.format_list_bulleted),
               title: "清单",
-              page: Inventories()),
+              page: Inventories(_onBadgeChanged)),
         ],
         floatingActionButton: FloatingActionButton(
             onPressed: () {
@@ -53,11 +72,13 @@ class GTDAppState extends State<GTDApp> {
                   GTDCard.addCard(card);
                   GTDCard.saveCards();
                   setState(() {});
+                  _onBadgeChanged();
                 }
               });
             },
             child: Icon(Icons.add)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        badges: _badgeMap,
       );
     });
 
@@ -68,5 +89,14 @@ class GTDAppState extends State<GTDApp> {
       ),
       home: home,
     );
+  }
+
+  void _onBadgeChanged() {
+    int count = GTDCard.countBasketCard();
+    _badgeMap.updateBadge("收集箱", count > 0 ? "$count" : null);
+    count = GTDCard.countExpiredActionCard();
+    _badgeMap.updateBadge("行动", count > 0 ? "$count" : null);
+    count = GTDCard.countTodayCard();
+    _badgeMap.updateBadge("日历", count > 0 ? "$count" : null);
   }
 }

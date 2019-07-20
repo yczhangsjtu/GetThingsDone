@@ -5,6 +5,10 @@ import 'package:flutter_gtd/components/card.dart';
 import 'package:flutter_gtd/components/styles.dart';
 
 class Inventories extends StatefulWidget {
+  final VoidCallback onBadgeChanged;
+
+  Inventories(this.onBadgeChanged);
+
   @override
   State<StatefulWidget> createState() {
     return _InventoriesState();
@@ -113,12 +117,14 @@ class _InventoriesState extends State<Inventories> {
         if (GTDCard.updateInventoryCard(index, inventory, card)) {
           setState(() {});
           GTDCard.saveCards();
+          widget?.onBadgeChanged();
         }
       }
     }, onRemoveCallback: () {
       if (GTDCard.removeInventoryCard(index, inventory)) {
         setState(() {});
         GTDCard.saveCards();
+        widget?.onBadgeChanged();
       }
     });
   }
@@ -162,6 +168,7 @@ class _InventoriesState extends State<Inventories> {
                   Inventory.saveInventories();
                   Navigator.of(context).pop();
                   setState(() {});
+                  widget?.onBadgeChanged();
                 }
               },
             ),
@@ -192,6 +199,7 @@ class _InventoriesState extends State<Inventories> {
               Inventory.removeInventory(currentIndex);
               Inventory.saveInventories();
               setState(() {});
+              widget?.onBadgeChanged();
             }),
       ],
     );
@@ -269,6 +277,7 @@ class _InventoriesState extends State<Inventories> {
                 Inventory.saveInventories();
                 Navigator.of(context).pop();
                 setState(() {});
+                widget?.onBadgeChanged();
               },
             ),
             FlatButton(

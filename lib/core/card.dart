@@ -65,6 +65,17 @@ class GTDCard {
     return null;
   }
 
+  static int countCard(bool Function(GTDCard) tester) {
+    int count = 0;
+    int n = cards.length;
+    for (int i = 0; i < n; i++) {
+      if (tester(cards[i])) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   static int findBasketCard(int index) {
     return findCard(index, (card) {
       return card is BasketCard;
@@ -89,14 +100,18 @@ class GTDCard {
     return false;
   }
 
+  static int countBasketCard() {
+    return countCard((card) {
+      return card is BasketCard;
+    });
+  }
+
   static bool isArrangedActionCard(GTDCard card) {
     return card is ActionCard && card.waiting == null && !card.expired();
   }
 
   static int findArrangedActionCard(int index) {
-    return findCard(index, (card) {
-      return isArrangedActionCard(card);
-    });
+    return findCard(index, isArrangedActionCard);
   }
 
   static bool removeArrangedActionCard(int index) {
@@ -117,10 +132,12 @@ class GTDCard {
     return false;
   }
 
+  static bool isWaitingActionCard(GTDCard card) {
+    return card is ActionCard && card.waiting != null;
+  }
+
   static int findWaitingActionCard(int index) {
-    return findCard(index, (card) {
-      return card is ActionCard && card.waiting != null;
-    });
+    return findCard(index, isWaitingActionCard);
   }
 
   static bool removeWaitingActionCard(int index) {
@@ -141,10 +158,12 @@ class GTDCard {
     return false;
   }
 
+  static bool isExpiredCard(GTDCard card) {
+    return card is ActionCard && card.expired();
+  }
+
   static int findExpiredActionCard(int index) {
-    return findCard(index, (card) {
-      return card is ActionCard && card.expired();
-    });
+    return findCard(index, isExpiredCard);
   }
 
   static bool removeExpiredActionCard(int index) {
@@ -165,6 +184,19 @@ class GTDCard {
     return false;
   }
 
+  static int countTodayCard() {
+    return countCard((card) {
+      return card is ActionCard &&
+          card.timeOptions.any((o) {
+            return o.match(DateTimeUtils.today());
+          });
+    });
+  }
+
+  static int countExpiredActionCard() {
+    return countCard(isExpiredCard);
+  }
+
   static int findInventoryCard(int index, Inventory inventory) {
     return findCard(index, (card) {
       return card is InventoryCard && inventory.filterRule.match(card.title);
@@ -173,14 +205,15 @@ class GTDCard {
 
   static bool removeInventoryCard(int index, Inventory inventory) {
     int i = findInventoryCard(index, inventory);
-    if(i != null) {
+    if (i != null) {
       cards.removeAt(i);
       return true;
     }
     return false;
   }
 
-  static bool updateInventoryCard(int index, Inventory inventory, GTDCard card) {
+  static bool updateInventoryCard(
+      int index, Inventory inventory, GTDCard card) {
     int i = findInventoryCard(index, inventory);
     if (i != null) {
       cards[i] = card;
@@ -574,15 +607,15 @@ class Inventory {
 
   static Inventory deserialize(String s) {
     int split = s.indexOf(";");
-    if(split == -1) {
+    if (split == -1) {
       return null;
     }
-    FilterRule filterRule = FilterRule.deserialize(s.substring(split+1));
-    if(filterRule == null) {
+    FilterRule filterRule = FilterRule.deserialize(s.substring(split + 1));
+    if (filterRule == null) {
       return null;
     }
     String name = CardUtils.decodeBase64String(s.substring(0, split));
-    if(name == null) {
+    if (name == null) {
       return null;
     }
     return Inventory(name, filterRule);
@@ -592,6 +625,7 @@ class Inventory {
     _inventories = _inventories ?? [];
     return _inventories;
   }
+
   static List<Inventory> _inventories;
 
   static int firstMatchingInventory(String s) {
@@ -622,20 +656,20 @@ class Inventory {
   }
 
   static bool addInventoryAndApply(Inventory inventory) {
-    if(inventory == null) {
+    if (inventory == null) {
       return false;
     }
-    if(!addInventory(inventory.name)) {
+    if (!addInventory(inventory.name)) {
       return false;
     }
-    if(!updateInventoryFilter(inventories.length - 1, inventory.filterRule)) {
+    if (!updateInventoryFilter(inventories.length - 1, inventory.filterRule)) {
       return false;
     }
     return true;
   }
 
   static bool removeInventory(int index) {
-    if(!updateInventoryFilter(index, FilterRule())) {
+    if (!updateInventoryFilter(index, FilterRule())) {
       return false;
     }
     inventories.removeAt(index);

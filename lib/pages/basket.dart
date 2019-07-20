@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
-import 'package:flutter_gtd/components/styles.dart';
 import 'package:flutter_gtd/components/card.dart';
 
 class Basket extends StatefulWidget {
+  final VoidCallback onBadgeChanged;
+
+  Basket(this.onBadgeChanged);
+
   @override
   State<StatefulWidget> createState() {
     return _BasketState();
@@ -42,12 +45,14 @@ class _BasketState extends State<Basket> {
         if (GTDCard.updateBasketCard(index, card)) {
           setState(() {});
           GTDCard.saveCards();
+          widget?.onBadgeChanged();
         }
       }
     }, onRemoveCallback: () {
       if (GTDCard.removeBasketCard(index)) {
         setState(() {});
         GTDCard.saveCards();
+        widget?.onBadgeChanged();
       }
     });
   }

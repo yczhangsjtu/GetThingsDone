@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
-import 'package:flutter_gtd/core/time.dart';
-import 'package:flutter_gtd/core/date_time_utils.dart';
 import 'package:flutter_gtd/components/card.dart';
 import 'package:flutter_gtd/components/styles.dart';
 
 class Actions extends StatefulWidget {
+  final VoidCallback onBadgeChanged;
+
+  Actions(this.onBadgeChanged);
+
   @override
   State<StatefulWidget> createState() {
     return _ActionsState();
@@ -112,6 +114,7 @@ class _ActionsState extends State<Actions> {
         if (updated) {
           setState(() {});
           GTDCard.saveCards();
+          widget.onBadgeChanged();
         }
       }
     }, onRemoveCallback: () {
@@ -126,6 +129,7 @@ class _ActionsState extends State<Actions> {
       if (removed) {
         setState(() {});
         GTDCard.saveCards();
+        widget.onBadgeChanged();
       }
     });
   }
