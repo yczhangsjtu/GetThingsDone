@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
-import 'styles.dart';
-import 'card.dart';
+import 'package:flutter_gtd/components/styles.dart';
+import 'package:flutter_gtd/components/card.dart';
 
 class Basket extends StatefulWidget {
   @override

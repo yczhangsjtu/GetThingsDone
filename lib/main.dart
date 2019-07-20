@@ -5,7 +5,7 @@ import 'pages/basket.dart';
 import 'pages/actions.dart';
 import 'pages/calendar.dart';
 import 'pages/inventories.dart';
-import 'pages/card.dart';
+import 'package:flutter_gtd/components/card.dart';
 
 void main() {
   Inventory.loadInventories().then((v) {

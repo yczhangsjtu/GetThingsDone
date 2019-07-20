@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gtd/core/card.dart';
 
-import 'card.dart';
-import 'styles.dart';
+import 'package:flutter_gtd/components/card.dart';
+import 'package:flutter_gtd/components/styles.dart';
 
 class Inventories extends StatefulWidget {
   @override
