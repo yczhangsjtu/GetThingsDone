@@ -3,8 +3,8 @@
 这是一个简易的APP，用以协助管理一个GTD系统。
 这个系统是大名鼎鼎的*GTD*书中所提出的系统的一个简易版本的变种。
 
-![](docs/1.png)
-![](docs/2.png)
+![](docs/1234.png)
+![](docs/5678.png)
 
 ## 简易的GTD系统
 
@@ -66,12 +66,14 @@ On the other hand, I don't think I am the suitable person to implement the logic
 | 1.0.1   | Add badge notification to bottom navigation bar. |
 |         | Change the calendar style. |
 |         | Add checkbox to today page. |
+|         | Fix expiration calculate bug. |
+|         | Enable launcher icon. |
 
 ## TODO
 
 ### Features
 
-- 下一步行动换其他字体
+- 下一步行动换其他字体，没有设置下一步行动时警告
 - 日历界面调整
   - 更完善的日期切换系统
   - 给今天界面加上时间线，标注固定时间的行动
