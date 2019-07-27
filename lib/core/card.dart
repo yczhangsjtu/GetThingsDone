@@ -396,24 +396,24 @@ class ActionCard extends GTDCard {
   }
 
   bool expired() {
-    return timeOptions?.any((timeOption) {
+    return !(timeOptions?.any((timeOption) {
           if (timeOption is Period) {
-            return false;
+            return true;
           }
           FixedTime fixedTime = timeOption as FixedTime;
           if (fixedTime.day < DateTimeUtils.today()) {
-            return true;
+            return false;
           }
           if (fixedTime.day > DateTimeUtils.today()) {
-            return false;
+            return true;
           }
           if (fixedTime.start == null) {
-            return false;
+            return true;
           }
-          return fixedTime.start + (fixedTime.length ?? 0) <=
+          return fixedTime.start + (fixedTime.length ?? 0) >
               DateTimeUtils.now();
-        } ??
-        false);
+        }) ??
+        true);
   }
 
   static Set<String> get completedCards {
