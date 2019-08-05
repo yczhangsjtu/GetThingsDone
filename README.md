@@ -68,6 +68,7 @@ On the other hand, I don't think I am the suitable person to implement the logic
 |         | Add checkbox to today page. |
 |         | Fix expiration calculate bug. |
 |         | Enable launcher icon. |
+| 1.0.2   | Enable pasting in editing card and inventory name. |
 
 ## TODO
 
