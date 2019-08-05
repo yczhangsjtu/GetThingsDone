@@ -7,12 +7,10 @@ typedef Future<dynamic> OnGTDCardCallback(dynamic card);
 
 Widget buildCard(BuildContext context, GTDCard card,
     {TextEditingController controller,
-    FocusNode focusNode,
     OnGTDCardCallback onGTDCardCallback,
     VoidCallback onRemoveCallback,
     int restrictedToDay}) {
-  assert(
-      onGTDCardCallback == null || (controller != null && focusNode != null));
+  assert(onGTDCardCallback == null || controller != null);
   Widget comments = card.comments.isEmpty
       ? Container()
       : Column(
@@ -82,8 +80,7 @@ Widget buildCard(BuildContext context, GTDCard card,
                       showDialog(
                           context: context,
                           builder: (context) {
-                            return buildCardEditingDialog(
-                                context, controller, focusNode);
+                            return buildCardEditingDialog(context, controller);
                           }).then(onGTDCardCallback);
                     }),
             onRemoveCallback == null
@@ -132,7 +129,7 @@ class _ActionCardCompleteCheckboxState
         widget.card.setCompleted(value, DateTimeUtils.today());
         ActionCard.saveCompleted();
         setState(() {});
-        if(widget.onBadgeChanged != null) {
+        if (widget.onBadgeChanged != null) {
           widget.onBadgeChanged();
         }
       },
@@ -142,7 +139,6 @@ class _ActionCardCompleteCheckboxState
 
 Widget buildCalendarCard(BuildContext context, GTDCard card,
     {TextEditingController controller,
-    FocusNode focusNode,
     int restrictedToDay,
     bool showComments,
     bool showWaiting,
@@ -229,17 +225,15 @@ Widget buildCalendarCard(BuildContext context, GTDCard card,
   );
 }
 
-Widget buildCardEditingDialog(BuildContext context,
-    TextEditingController controller, FocusNode focusNode) {
+Widget buildCardEditingDialog(
+    BuildContext context, TextEditingController controller) {
   return SimpleDialog(
     contentPadding: EdgeInsets.all(10),
     backgroundColor: kEditCardDialogColor,
     children: <Widget>[
-      EditableText(
-        backgroundCursorColor: Colors.black,
+      TextField(
         cursorColor: Colors.black,
         controller: controller,
-        focusNode: focusNode,
         style: kEditCardDialogStyle,
         maxLines: null,
       ),

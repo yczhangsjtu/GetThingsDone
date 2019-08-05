@@ -21,7 +21,6 @@ class _InventoriesState extends State<Inventories> {
   TextEditingController _controller = TextEditingController();
   TextEditingController _beginController = TextEditingController();
   TextEditingController _endController = TextEditingController();
-  FocusNode _focusNode = FocusNode();
   bool _currentIsOr;
 
   @override
@@ -112,7 +111,7 @@ class _InventoriesState extends State<Inventories> {
     Inventory inventory = Inventory.inventories[currentIndex];
     return buildCard(context, cards[index],
         controller: _controller,
-        focusNode: _focusNode, onGTDCardCallback: (card) {
+        onGTDCardCallback: (card) {
       if (card != null) {
         if (GTDCard.updateInventoryCard(index, inventory, card)) {
           setState(() {});
@@ -134,21 +133,19 @@ class _InventoriesState extends State<Inventories> {
     showDialog(
         context: context,
         builder: (context) {
-          return _buildAddInventoryDialog(context, _controller, _focusNode);
+          return _buildAddInventoryDialog(context, _controller);
         });
   }
 
   Widget _buildAddInventoryDialog(BuildContext context,
-      TextEditingController controller, FocusNode focusNode) {
+      TextEditingController controller) {
     return SimpleDialog(
       contentPadding: EdgeInsets.all(10),
       backgroundColor: kEditCardDialogColor,
       children: <Widget>[
-        EditableText(
-          backgroundCursorColor: Colors.black,
+        TextField(
           cursorColor: Colors.black,
           controller: controller,
-          focusNode: focusNode,
           style: kEditCardDialogStyle,
           maxLines: null,
         ),

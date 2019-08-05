@@ -17,7 +17,6 @@ class Actions extends StatefulWidget {
 class _ActionsState extends State<Actions> {
   int currentIndex = 0;
   TextEditingController _controller = TextEditingController();
-  FocusNode _focusNode = FocusNode();
 
   final List<GTDCard> arrangedCards = [];
   final List<GTDCard> waitingCards = [];
@@ -100,8 +99,7 @@ class _ActionsState extends State<Actions> {
 
   Widget _buildCard(BuildContext context, int index) {
     return buildCard(context, cardLists[currentIndex][index],
-        controller: _controller,
-        focusNode: _focusNode, onGTDCardCallback: (card) {
+        controller: _controller, onGTDCardCallback: (card) {
       if (card != null) {
         bool updated = false;
         if (currentIndex == 0) {

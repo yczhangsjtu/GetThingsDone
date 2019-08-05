@@ -16,7 +16,6 @@ class Basket extends StatefulWidget {
 class _BasketState extends State<Basket> {
   List<GTDCard> cards;
   TextEditingController _controller = TextEditingController();
-  FocusNode _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +37,8 @@ class _BasketState extends State<Basket> {
   }
 
   Widget _buildCard(BuildContext context, int index) {
-    return buildCard(context, cards[index],
-        controller: _controller,
-        focusNode: _focusNode, onGTDCardCallback: (card) {
+    return buildCard(context, cards[index], controller: _controller,
+        onGTDCardCallback: (card) {
       if (card != null) {
         if (GTDCard.updateBasketCard(index, card)) {
           setState(() {});
