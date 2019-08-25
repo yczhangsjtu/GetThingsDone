@@ -80,22 +80,26 @@ class _BottomNavigationScaffoldState extends State<BottomNavigationScaffold> {
               ? null
               : Positioned(
                   right: 0,
-                  child: new Container(
-                    decoration: new BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: new Text(
-                      _badgeText,
-                      style: new TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      key: ValueKey<String>(_badgeText),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      textAlign: TextAlign.center,
+                      constraints: BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        _badgeText,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 );
@@ -104,9 +108,11 @@ class _BottomNavigationScaffoldState extends State<BottomNavigationScaffold> {
             child: item.icon,
           );
           return BottomNavigationBarItem(
-            icon: badge == null ? icon : Stack(
-              children: <Widget>[icon, badge],
-            ),
+            icon: badge == null
+                ? icon
+                : Stack(
+                    children: <Widget>[icon, badge],
+                  ),
             title: Text(item.title),
             backgroundColor: Theme.of(context).accentColor,
           );

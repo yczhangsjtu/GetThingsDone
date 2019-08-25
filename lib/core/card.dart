@@ -396,7 +396,7 @@ class ActionCard extends GTDCard {
   }
 
   bool expired() {
-    return !(timeOptions?.any((timeOption) {
+    return waiting == null && !(timeOptions?.any((timeOption) {
           if (timeOption is Period) {
             return true;
           }
