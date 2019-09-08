@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_gtd/core/card.dart';
+import 'package:flutter_gtd/core/time.dart';
 import 'package:flutter_gtd/core/date_time_utils.dart';
 import 'package:flutter_gtd/components/card.dart';
 import 'package:flutter_gtd/components/styles.dart';
@@ -61,7 +62,8 @@ class _CalendarState extends State<Calendar> {
       ],
     );
 
-    Widget cardList = ListView.separated(
+    Widget cardList;
+    cardList = ListView.separated(
       itemBuilder: _buildCard,
       itemCount: cards.length,
       separatorBuilder: (context, index) {
@@ -71,23 +73,32 @@ class _CalendarState extends State<Calendar> {
         );
       },
     );
-
     if (currentIndex == 1) {
+      final day = DateTimeUtils.yearMonthDayFromInt(currentDay);
       cardList = Column(
         children: <Widget>[
-          _buildDaySelector(context),
+          /*  _buildDaySelector(context),
           Text(
             "${DateTimeUtils.dayToString(currentDay)} 周${DateTimeUtils.weekDayName(DateTimeUtils.dayOfWeek(currentDay))}",
             style: kCalendarDateStyle,
+          ),*/
+          TableCalendar(
+            events: _createEventsMap(),
+            selectedDay: DateTime(day~/10000, (day~/100)%100, day%100),
+            onDaySelected: (dateTime, list) {
+              setState(() {
+                currentDay = DateTimeUtils.yearMonthDayToInt(
+                    dateTime.year, dateTime.month, dateTime.day);
+              });
+            },
           ),
           Expanded(child: cardList),
         ],
       );
     }
 
-    cardList = Padding(padding: EdgeInsets.all(5), child: cardList);
-
     cardList = Container(
+      padding: EdgeInsets.all(5),
       child: cardList,
       color: kActiveTabColor,
     );
@@ -106,6 +117,48 @@ class _CalendarState extends State<Calendar> {
     );
   }
 
+  Map<DateTime, List> _createEventsMap() {
+    final resultCards = Map<DateTime, List>();
+    GTDCard.cards.forEach((card) {
+      if(card is ActionCard) {
+        card.timeOptions.forEach((timeOption) {
+          if(timeOption is FixedTime) {
+            final date = DateTimeUtils.yearMonthDayFromInt(timeOption.day);
+            final dateTime = DateTime(date~/10000, (date~/100) % 100, date%100);
+            if(!resultCards.containsKey(dateTime)) {
+              resultCards[dateTime] = [];
+            }
+            resultCards[dateTime].add(card);
+          } else if(timeOption is Period) {
+            var today = DateTime.now();
+            today = DateTime(today.year, today.month, today.day);
+            for(int i = 0; i < 365; i++) {
+              final dateTime = today.add(Duration(days: i));
+              final day = DateTimeUtils.yearMonthDayToInt(
+                  dateTime.year, dateTime.month, dateTime.day);
+              if(timeOption.match(day)) {
+                if(!resultCards.containsKey(dateTime)) {
+                  resultCards[dateTime] = [];
+                }
+                resultCards[dateTime].add(card);
+              }
+            }
+          }
+        });
+      }
+    });
+    final result = Map<DateTime, List>();
+    resultCards.forEach((dateTime, list) {
+      final day = DateTimeUtils.yearMonthDayToInt(
+          dateTime.year, dateTime.month, dateTime.day);
+      list.sort((card1, card2) {
+        return _compareCards(card1, card2, day);
+      });
+      result[dateTime] = list.map((card) => card.title).toList();
+    });
+    return result;
+  }
+
   List<GTDCard> _filterActionCardsForDay(int day) {
     return GTDCard.cards.where((card) {
       return card is ActionCard &&
@@ -114,40 +167,42 @@ class _CalendarState extends State<Calendar> {
             return timeOption.match(day);
           });
     }).toList()
-      ..sort((GTDCard card1, GTDCard card2) {
-        ActionCard _card1 = card1 as ActionCard;
-        ActionCard _card2 = card2 as ActionCard;
-        int start1;
-        for (int i = 0; i < _card1.timeOptions.length; i++) {
-          if (!_card1.timeOptions[i].match(day)) {
-            continue;
-          }
-          if (_card1.timeOptions[i].start != null &&
-              (start1 == null || _card1.timeOptions[i].start < start1)) {
-            start1 = _card1.timeOptions[i].start;
-          }
-        }
-        int start2;
-        for (int i = 0; i < _card2.timeOptions.length; i++) {
-          if (!_card2.timeOptions[i].match(day)) {
-            continue;
-          }
-          if (_card2.timeOptions[i].start != null &&
-              (start2 == null || _card2.timeOptions[i].start < start2)) {
-            start2 = _card2.timeOptions[i].start;
-          }
-        }
-        if (start1 == null && start2 != null) {
-          return 1;
-        }
-        if (start1 != null && start2 == null) {
-          return -1;
-        }
-        if (start1 != null && start2 != null && start1 != start2) {
-          return start1 - start2;
-        }
-        return _card1.importance.index - _card2.importance.index;
-      });
+      ..sort((card1, card2) {return _compareCards(card1, card2, day);});
+  }
+
+  static int _compareCards(GTDCard card1, GTDCard card2, int day) {
+    ActionCard _card1 = card1 as ActionCard;
+    ActionCard _card2 = card2 as ActionCard;
+    int start1;
+    for (int i = 0; i < _card1.timeOptions.length; i++) {
+      if (!_card1.timeOptions[i].match(day)) {
+        continue;
+      }
+      if (_card1.timeOptions[i].start != null &&
+          (start1 == null || _card1.timeOptions[i].start < start1)) {
+        start1 = _card1.timeOptions[i].start;
+      }
+    }
+    int start2;
+    for (int i = 0; i < _card2.timeOptions.length; i++) {
+      if (!_card2.timeOptions[i].match(day)) {
+        continue;
+      }
+      if (_card2.timeOptions[i].start != null &&
+          (start2 == null || _card2.timeOptions[i].start < start2)) {
+        start2 = _card2.timeOptions[i].start;
+      }
+    }
+    if (start1 == null && start2 != null) {
+      return 1;
+    }
+    if (start1 != null && start2 == null) {
+      return -1;
+    }
+    if (start1 != null && start2 != null && start1 != start2) {
+      return start1 - start2;
+    }
+    return _card1.importance.index - _card2.importance.index;
   }
 
   Widget _buildCard(BuildContext context, int index) {
