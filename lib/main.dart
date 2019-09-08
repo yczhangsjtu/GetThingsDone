@@ -81,6 +81,7 @@ class GTDAppState extends State<GTDApp> {
             child: Icon(Icons.add)),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         badges: _badgeMap,
+        scrollToChangePage: true,
       );
     });
 

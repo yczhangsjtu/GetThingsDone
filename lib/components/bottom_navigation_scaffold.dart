@@ -39,6 +39,7 @@ class BottomNavigationScaffold extends StatefulWidget {
     this.floatingActionButtonLocation,
     this.bottomBarColor,
     this.badges,
+    this.scrollToChangePage,
   })  : assert(items != null && items.length > 0),
         super(key: key);
 
@@ -47,6 +48,7 @@ class BottomNavigationScaffold extends StatefulWidget {
   final FloatingActionButtonLocation floatingActionButtonLocation;
   final Color bottomBarColor;
   final BadgeMap badges;
+  final bool scrollToChangePage;
 
   @override
   State<StatefulWidget> createState() {
@@ -56,18 +58,38 @@ class BottomNavigationScaffold extends StatefulWidget {
 
 class _BottomNavigationScaffoldState extends State<BottomNavigationScaffold> {
   int currentIndex = 0;
+  PageController _controller;
 
   @override
   void initState() {
     super.initState();
+    if (widget.scrollToChangePage == true) {
+      _controller = new PageController();
+      _controller.addListener(() {
+        setState(() {
+          currentIndex = _controller.page.round();
+        });
+      });
+    }
     widget.badges?.addListener(() {
       setState(() {});
     });
   }
 
   @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Widget body = widget.items[currentIndex].page;
+    Widget body = widget.scrollToChangePage == true
+        ? PageView(
+            children: widget.items.map((item) => item.page).toList(),
+            controller: _controller,
+          )
+        : widget.items[currentIndex].page;
 
     return Scaffold(
       body: body,
@@ -120,6 +142,8 @@ class _BottomNavigationScaffoldState extends State<BottomNavigationScaffold> {
         onTap: (index) {
           setState(() {
             currentIndex = index;
+            _controller?.animateToPage(index,
+                duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
           });
         },
         currentIndex: currentIndex,
