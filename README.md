@@ -70,6 +70,8 @@ On the other hand, I don't think I am the suitable person to implement the logic
 |         | Enable launcher icon. |
 | 1.0.2   | Enable pasting in editing card and inventory name. |
 | 1.0.3   | Fix bug: waiting action card was sometimes considered as expired. |
+| 1.0.4   | Enable swiping between pages. |
+|         | Improve the calendar. |
 
 ## TODO
 
