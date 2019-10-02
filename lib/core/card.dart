@@ -433,6 +433,10 @@ class ActionCard extends GTDCard {
     }
   }
 
+  bool countInCalendar() {
+    return this.importance != Importance.none;
+  }
+
   bool getCompleted(int day) {
     return completedCards
         .contains("${CardUtils.encodeBase64String(this.title)}:$day");

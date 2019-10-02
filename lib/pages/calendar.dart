@@ -77,11 +77,6 @@ class _CalendarState extends State<Calendar> {
       final day = DateTimeUtils.yearMonthDayFromInt(currentDay);
       cardList = Column(
         children: <Widget>[
-          /*  _buildDaySelector(context),
-          Text(
-            "${DateTimeUtils.dayToString(currentDay)} 周${DateTimeUtils.weekDayName(DateTimeUtils.dayOfWeek(currentDay))}",
-            style: kCalendarDateStyle,
-          ),*/
           TableCalendar(
             events: _createEventsMap(),
             selectedDay: DateTime(day~/10000, (day~/100)%100, day%100),
@@ -119,8 +114,9 @@ class _CalendarState extends State<Calendar> {
 
   Map<DateTime, List> _createEventsMap() {
     final resultCards = Map<DateTime, List>();
+    // Populate the cards of each date
     GTDCard.cards.forEach((card) {
-      if(card is ActionCard) {
+      if(card is ActionCard && card.countInCalendar()) {
         card.timeOptions.forEach((timeOption) {
           if(timeOption is FixedTime) {
             final date = DateTimeUtils.yearMonthDayFromInt(timeOption.day);
@@ -147,6 +143,7 @@ class _CalendarState extends State<Calendar> {
         });
       }
     });
+    // Sort the cards of each date
     final result = Map<DateTime, List>();
     resultCards.forEach((dateTime, list) {
       final day = DateTimeUtils.yearMonthDayToInt(
@@ -214,45 +211,5 @@ class _CalendarState extends State<Calendar> {
         showNextAct: currentIndex == 0,
         showCheckbox: currentIndex == 0,
         onBadgeChanged: widget.onBadgeChanged);
-  }
-
-  Widget _buildDaySelector(BuildContext context) {
-    currentDay = currentDay ?? DateTimeUtils.today();
-    Widget child = Row(
-      children: <Widget>[
-        Expanded(
-            child: TextField(
-          controller: _controller,
-          style: kCalendarDateStyle,
-        )),
-        GestureDetector(
-            child: Text("确定"),
-            onTap: () {
-              int day = DateTimeUtils.absoluteDateToday(_controller.text);
-              if (day != null) {
-                setState(() {
-                  currentDay = day;
-                });
-              }
-            }),
-        GestureDetector(
-            child: Icon(Icons.arrow_left),
-            onTap: () {
-              setState(() {
-                currentDay = currentDay ?? DateTimeUtils.today();
-                currentDay--;
-              });
-            }),
-        GestureDetector(
-            child: Icon(Icons.arrow_right),
-            onTap: () {
-              setState(() {
-                currentDay = currentDay ?? DateTimeUtils.today();
-                currentDay++;
-              });
-            }),
-      ],
-    );
-    return child;
   }
 }
